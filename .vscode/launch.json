@@ -1,0 +1,72 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    
+    {
+      "name": "cl.exe build and debug active file", // デバッグ時の選択肢
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${fileDirname}\\${fileBasenameNoExtension}_cl_debug.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      //"console": "newExternalWindow", //外部タイミナル上で出力
+      "console": "integratedTerminal", //内部ターミナル上で出力
+      //"externalConsole": false, //非推奨
+      "preLaunchTask": "cl.exe build active file for debug"
+    },
+    // 他の構成があれば...
+    {
+      "name": "cl.exe build only active file",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${fileDirname}\\${fileBasenameNoExtension}_cl.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      //"console": "newExternalWindow", //外部タイミナル上で出力
+      "console": "integratedTerminal", //内部ターミナル上で出力
+      //"externalConsole": false, //非推奨
+      "preLaunchTask": "cl.exe build active file"
+    },
+    {
+      "name": "(gdb) 起動",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${fileDirname}\\${fileBasenameNoExtension}_mingw_debug.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "C:\\Users\\tromb\\Documents\\prog\\progs\\MinGWs\\winlibs-x86_64-posix-seh-gcc-11.3.0-mingw-w64ucrt-10.0.0-r3\\mingw64\\bin\\gdb.exe",
+      "setupCommands": [
+        {
+          "description": "gdb の再フォーマットを有効にする",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "逆アセンブリ フレーバーを Intel に設定",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        }
+      ],
+      "preLaunchTask": "MinGW build and debug file"
+    },
+    {
+      "name": "MinGW build only and active file",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${fileDirname}\\${fileBasenameNoExtension}_mingw.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "preLaunchTask": "MinGW build and active file"
+    }
+  ]
+}
