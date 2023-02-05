@@ -1,5 +1,5 @@
 ## ※I'm Japanese, so my English skills are low .  
-## Now,I'm making.Next updating is maybe done in next Sunday.  
+## Now,I'm making.Next updating may be done in next Sunday.  
   
 # YYScreenTime_win  
 Windows ScreenTime for me  
