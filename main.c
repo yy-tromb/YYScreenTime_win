@@ -11,9 +11,17 @@
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine,
                    int nCmdShow) {
    DWORD allProcess[1024];
    int processCount;
    DWORD neededSize;
+
+   if(EnumProcesses(allProcess,sizeof(allProcess),&neededSize)==0){
+      MessageBoxW(NULL,L"プロセスの取得に失敗しました",L"エラー",MB_OK);
+      exit(EXIT_FAILURE);
+      return EXIT_FAILURE;
+   }
+   
+   //
 }
