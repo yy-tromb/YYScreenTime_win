@@ -55,4 +55,5 @@ dkms.conf
 
 
 .vscode/
+/foo.c
 !/*.a
