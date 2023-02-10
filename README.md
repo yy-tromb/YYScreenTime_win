@@ -3,7 +3,7 @@
   
 # YYScreenTime_win  
 Windows ScreenTime for me  
-I'm a beginner of C and winAPI, so GUI of this app is only Messagebox.  
+I'm a beginner of C and winAPI, so GUI of this app may be bad.    
   
 ## build  
 required:User32.lib lib/libwinAPI_highDPI.a  
