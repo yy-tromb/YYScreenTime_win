@@ -56,7 +56,8 @@ dkms.conf
 # resource file
 *.res
 
+foo*.*
+
 .vscode/
-/foo.c
 o.txt
-!/*.a
+!/lib/*.a
