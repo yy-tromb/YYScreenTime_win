@@ -8,4 +8,4 @@ I'm a beginner of C and winAPI, so GUI of this app may be bad.
 ## build  
 required:User32.lib lib/libwinAPI_highDPI.a  
 setting required:include/winAPI_highDPI.h  
-I love VSCode,so I maybe build this app by VS Build Tools or MinGW.   
+I love VSCode,so I build this with MinGW.   
