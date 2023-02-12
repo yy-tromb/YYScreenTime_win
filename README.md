@@ -6,6 +6,7 @@ Windows ScreenTime for me
 I'm a beginner of C and winAPI, so GUI of this app may be bad.    
   
 ## build  
-required:User32.lib lib/libwinAPI_highDPI.a  
-setting required:include/winAPI_highDPI.h  
+only this: `$ make`
+You have to install make.  
+If you are windows, you can install make with winget `$ winget install GnuWin32.Make`  
 I love VSCode,so I build this with MinGW.   
