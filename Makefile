@@ -14,12 +14,19 @@ REOBJS = $(RESRCS:%.rc=%.res)
 
 LDFLAGS = -lwinapi_highDPI
 
-EXE = YYScreenTime_win.exe
+NAME = YYScreenTime_win
+EXT ?= exe
 
-build: $(EXE)
+ifeq ($(findstring -g,$(EXFLAGS)),-g)
+	BUILD = $(NAME)_debug.$(EXT)
+else
+	BUILD =$(NAME).$(EXT)
+endif
 
-$(EXE): $(OBJS) $(REOBJS)
-	$(CC) $(OBJS) $(REOBJS) $(CFLAGS) $(LIB) $(LDFLAGS) -o $(EXE)
+build: $(BUILD)
+
+$(BUILD): $(OBJS) $(REOBJS)
+	$(CC) $(OBJS) $(REOBJS) $(CFLAGS) $(EXFLAGS) $(LIB) $(LDFLAGS) -o $(BUILD)
 
 .SUFFIXES: .rc .res
 
@@ -27,7 +34,7 @@ $(EXE): $(OBJS) $(REOBJS)
 	$(RESCC) $< $(RESCFLAGS) -o $@
 
 .c.o:
-	$(CC) $(CFLAGS) $(INC) -c $< -o $@
+	$(CC) $(CFLAGS) $(EXFLAGS) $(INC) -c $< -o $@
 
 clean:
 	del $(OBJS)
@@ -36,7 +43,7 @@ clean:
 
 fullclean:
 	make clean
-	del $(EXE)
+	del $(BUILD)
 
 re:
 	make clean
