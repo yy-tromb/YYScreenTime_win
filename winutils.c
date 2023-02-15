@@ -2,6 +2,10 @@
 
 //共有はしない
 BOOL CALLBACK EnumWindowsProc(HWND hwnd , LPARAM lParam);
+struct EnumWindowProcData {
+   HWND *hWindows;
+   size_t *hWindows_count;
+};
 
 errno_t getProcesses(DWORD *allProcesses, wchar_t **allProcessesNames, int allProcesses_count) {
    DWORD allProcesses_size;
@@ -70,10 +74,11 @@ errno_t getProcesses(DWORD *allProcesses, wchar_t **allProcessesNames, int allPr
    return EXIT_SUCCESS;
 }
 
-errno_t getWindowHandles(HWND *hWindows,size_t windows_count){
+errno_t getWindowHandles(HWND *hWindows,size_t hWindows_count){
+   struct EnumWindowProcData *enumWindowProcData;
    //
 }
 
-BOOL CALLBACK EnumWindowsProc(HWND hwnd , LPARAM lParam){
-   //
+BOOL CALLBACK EnumWindowsProc(HWND hWindow , LPARAM lParam){
+   static count=0;
 };
