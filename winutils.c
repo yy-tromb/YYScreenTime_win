@@ -1,16 +1,17 @@
 #include "./include/winutils.h"
 
-//共有はしない
-BOOL CALLBACK EnumWindowsProc(HWND hwnd , LPARAM lParam);
+// 共有はしない
+BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
 struct EnumWindowProcData {
    HWND *hWindows;
-   size_t *hWindows_count;
+   size_t hWindows_count;
 };
 
-errno_t getProcesses(DWORD *allProcesses, wchar_t **allProcessesNames, int allProcesses_count) {
+errno_t getProcesses(DWORD *allProcesses, wchar_t **allProcessesNames,
+                     int allProcesses_count) {
    DWORD allProcesses_size;
    DWORD neededSize;
-   int count=0;
+   int count = 0;
 
    for (allProcesses_size = 2048; allProcesses_size <= 65536;
         allProcesses_size <<= 1) {
@@ -74,11 +75,19 @@ errno_t getProcesses(DWORD *allProcesses, wchar_t **allProcessesNames, int allPr
    return EXIT_SUCCESS;
 }
 
-errno_t getWindowHandles(HWND *hWindows,size_t hWindows_count){
-   struct EnumWindowProcData *enumWindowProcData;
-   //
+errno_t getWindowHandles(HWND *hWindows, size_t hWindows_count) {
+   struct EnumWindowProcData enumWindowProcData;
+   enumWindowProcData.hWindows_count = 1024;
+   EnumWindows(EnumWindowsProc,(LPARAM)&enumWindowProcData);
+   char hoge[256];
+   sprintf(hoge,"%d",enumWindowProcData.hWindows_count);
+   MessageBoxA(NULL,hoge,"",MB_OK);
 }
 
-BOOL CALLBACK EnumWindowsProc(HWND hWindow , LPARAM lParam){
-   static count=0;
+BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
+   static int count = 0;
+   struct EnumWindowProcData *enumWindowProcDataP = (struct EnumWindowProcData*)lParam;
+   //
+   count++;
+   enumWindowProcDataP->hWindows_count=count;
 };

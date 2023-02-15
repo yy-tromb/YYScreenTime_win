@@ -33,6 +33,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
    HWND hWindow;
    MSG message;
    FILE* file = fopen("./o.txt", "w,ccs=UTF-8");
+   HWND *hWindows;
+   size_t hWindows_count;
+   /*
    DWORD *allProcesses;
    wchar_t** allProcessesNames;
    int processes_count;
@@ -40,7 +43,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
    int i;
    for (i = 0; i < processes_count; i++) {
       fwprintf(file, allProcessesNames[i]);
-   }
+   }*/
+   getWindowHandles(hWindows,hWindows_count);
+   fclose(file);
 
    wndClass.style = CS_HREDRAW | CS_VREDRAW;
    wndClass.lpfnWndProc = WndProc;
@@ -77,6 +82,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
 }
 
 LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+   static int MOVE_x,MOVE_y;
+   static int SIZE_x,SIZE_y;
    switch (uMsg) {
       case WM_CREATE:
          LPCREATESTRUCT lpcs;
@@ -93,8 +100,8 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
       case WM_MOVE:
          wchar_t message_MOVE[128];
-         int MOVE_y = HIWORD(lParam);  // y 座標を取り出す
-         int MOVE_x = LOWORD(lParam);  // x 座標を取り出す
+         MOVE_y = HIWORD(lParam);  // y 座標を取り出す
+         MOVE_x = LOWORD(lParam);  // x 座標を取り出す
          swprintf_s(message_MOVE, sizeof(message_MOVE) / 2, L"WM_MOVE (%d, %d)",
                     MOVE_x, MOVE_y);
          SetWindowText(hWindow, message_MOVE);
@@ -102,8 +109,8 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
       case WM_SIZE:
          wchar_t message_SIZE[128];
-         int SIZE_y = HIWORD(lParam);  // y 座標を取り出す
-         int SIZE_x = LOWORD(lParam);  // x 座標を取り出す
+         SIZE_y = HIWORD(lParam);  // y 座標を取り出す
+         SIZE_x = LOWORD(lParam);  // x 座標を取り出す
          swprintf_s(message_SIZE, sizeof(message_SIZE) / 2, L"WM_SIZE (%d, %d)",
                     SIZE_x, SIZE_y);
          SetWindowText(hWindow, message_SIZE);
