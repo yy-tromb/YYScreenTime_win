@@ -27,6 +27,7 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine,
                    int nCmdShow) {
+   winAPI_highDPI();
    const wchar_t appName[] = L"mytest";
    WNDCLASS wndClass;
    HWND hWindow;
@@ -56,7 +57,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
       return 0;
    }
 
-   hWindow = CreateWindow(appName, L"yyhome-tromb test", WS_OVERLAPPEDWINDOW,
+   hWindow = CreateWindowW(appName, L"yyhome-tromb test", WS_OVERLAPPEDWINDOW,
                        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
                        CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
 
