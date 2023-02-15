@@ -66,3 +66,7 @@ errno_t getProcesses(DWORD *allProcesses, wchar_t **allProcessesNames, int allPr
    allProcesses_count = processNames_count;
    return EXIT_SUCCESS;
 }
+
+errno_t getWindowHandles(HWND *hWindows,size_t windows_count){
+   //
+}
