@@ -1,6 +1,15 @@
-#include <minwindef.h>
 #define UNICODE 1
 #define _UNICODE 1
+#ifndef __STDC_ISO_10646__
+#define __STDC_ISO_10646__ 201706;
+#endif
+#ifndef __STDC_UTF_16__
+#define __STDC_UTF_16__ 1;
+#endif
+#ifndef __STDC_UTF_32__
+#define __STDC_UTF_32__ 1;
+#endif
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,92 +19,107 @@
 #include <Psapi.h>
 #include <locale.h>
 
-#include <winAPI_highDPI.h>
+#include "./include/winAPI_highDPI.h"
+#include "./include/winutils.h"
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                    PWSTR lpCmdLine, int nCmdShow) {
-   winAPI_highDPI();
-   setlocale(LC_ALL, "");
-   DWORD init_allProcess[1024];
-   DWORD *allProcess;
-   DWORD neededSize;
-   int processCount;
-
-   if (EnumProcesses(init_allProcess, sizeof(init_allProcess), &neededSize) ==
-       0) {
-      MessageBoxW(NULL, L"プロセスの取得に失敗しました", L"エラー", MB_OK);
-      exit(EXIT_FAILURE);
-      return EXIT_FAILURE;
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine,
+                   int nCmdShow) {
+   const wchar_t appName[] = L"mytest";
+   WNDCLASS wndClass;
+   HWND hWindow;
+   MSG message;
+   FILE* file = fopen("./o.txt", "w,ccs=UTF-8");
+   DWORD allProcesses;
+   TCHAR** allProcessesNames;
+   int processes_count;
+   getProcesses(allProcesses, allProcessesNames, processes_count);
+   int i;
+   for (i = 0; i < processes_count; i++) {
+      fwprintf(file, allProcessesNames[i]);
    }
 
-   if (neededSize >= sizeof(init_allProcess)) {
-      int instead_allprocess_Size = sizeof(init_allProcess);
-      while (true) {
-         if (neededSize >= instead_allprocess_Size) {
-            DWORD instead_allProcess[(neededSize / sizeof(DWORD)) + 1024];
-            neededSize = 0;
-            if (EnumProcesses(instead_allProcess, sizeof(instead_allProcess),
-                              &neededSize) == 0) {
-               MessageBoxW(NULL, L"プロセスの取得に失敗しました", L"エラー",
-                           MB_OK);
-               exit(EXIT_FAILURE);
-               return EXIT_FAILURE;
-            } else {
-               instead_allprocess_Size = sizeof(instead_allProcess);
-               allProcess = instead_allProcess;
-            }
-         } else {
-            break;
+   wndClass.style = CS_HREDRAW | CS_VREDRAW;
+   wndClass.lpfnWndProc = WndProc;
+   wndClass.cbClsExtra = 0;
+   wndClass.cbWndExtra = 0;
+   wndClass.hInstance = hInstance;
+   wndClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+   wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+   wndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+   wndClass.lpszMenuName = NULL;
+   wndClass.lpszClassName = appName;
+
+   if (!RegisterClass(&wndClass)) {
+      return 0;
+   }
+
+   hWindow = CreateWindow(appName, L"yyhome-tromb test", WS_OVERLAPPEDWINDOW,
+                       CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+                       CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+
+   if (!hWindow) {
+      return 0;
+   }
+
+   ShowWindow(hWindow, nCmdShow);
+   UpdateWindow(hWindow);
+
+   while (GetMessage(&message, NULL, 0, 0) > 0) {
+      TranslateMessage(&message);
+      DispatchMessage(&message);
+   }
+
+   return message.wParam;
+}
+
+LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+   switch (uMsg) {
+      case WM_CREATE:
+         LPCREATESTRUCT lpcs;
+         wchar_t message_CREATE[512];
+         lpcs = (LPCREATESTRUCT)lParam;
+         wchar_t tmp[6];
+         swprintf_s(message_CREATE, sizeof(message_CREATE) / 2,
+                    L"lpszClass: %ls\nlpszName: %ls\n"
+                    L"x: %d\ny: %d\ncx: %d\ncy: %d\n",
+                    lpcs->lpszClass, lpcs->lpszName, lpcs->x, lpcs->y, lpcs->cx,
+                    lpcs->cy);
+         MessageBox(hWindow, message_CREATE, L"WM_CREATE",
+                    MB_OK | MB_ICONINFORMATION);
+         return 0;
+
+      case WM_MOVE:
+         wchar_t message_MOVE[128];
+         int MOVE_y = HIWORD(lParam);  // y 座標を取り出す
+         int MOVE_x = LOWORD(lParam);  // x 座標を取り出す
+         swprintf_s(message_MOVE, sizeof(message_MOVE) / 2, L"WM_MOVE (%d, %d)",
+                    MOVE_x, MOVE_y);
+         SetWindowText(hWindow, message_MOVE);
+         return 0;
+
+      case WM_SIZE:
+         wchar_t message_SIZE[128];
+         int SIZE_y = HIWORD(lParam);  // y 座標を取り出す
+         int SIZE_x = LOWORD(lParam);  // x 座標を取り出す
+         swprintf_s(message_SIZE, sizeof(message_SIZE) / 2, L"WM_SIZE (%d, %d)",
+                    SIZE_x, SIZE_y);
+         SetWindowText(hWindow, message_SIZE);
+         return 0;
+
+      case WM_CLOSE:
+         int messageboxID = MessageBox(hWindow, L"本当に終了しますか？", L"終了の確認",
+                                   MB_YESNO | MB_ICONWARNING);
+         if (messageboxID == IDYES) {
+            DestroyWindow(hWindow);
          }
-      }
-   } else {
-      allProcess = init_allProcess;
+         return 0;
+
+      case WM_DESTROY:
+         PostQuitMessage(0);
+         return 0;
    }
 
-   processCount = neededSize / sizeof(DWORD);
-   wchar_t *processNames[processCount];
-   int processNamesCount = 0;
-
-   for (int i = 0; i < processCount; i++) {
-      HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-                                    FALSE, allProcess[i]);
-      if (hProcess != NULL) {
-         DWORD fileNameSize;
-         for (fileNameSize = 256; fileNameSize <= 65536; fileNameSize <<= 1) {
-            // ファイル名を格納
-            wchar_t fileName[fileNameSize];
-            if (QueryFullProcessImageNameW(hProcess, 0, fileName,
-                                           &fileNameSize) == 0) {
-               if (ERROR_INSUFFICIENT_BUFFER == GetLastError()) {
-                  continue;  // エラーなのでループを続けて文字数を増やす
-               } else {
-                  // QueryFullProcessImageNameWでエラーだからループから抜ける
-                  break;
-               }
-            } else {
-               // ループから抜けて次のPIDへ
-               fileNameSize++;
-               wchar_t *fileName_tmp =
-                   (wchar_t *)malloc(sizeof(wchar_t) * fileNameSize);
-               wcscpy_s(fileName_tmp, fileNameSize, fileName);
-               processNames[processNamesCount++] = fileName_tmp;
-               break;
-            }
-         }
-         CloseHandle(hProcess);
-         continue;  // 明示
-      } else {
-         // Couldn't Get Process Handle
-         continue;  // 明示
-      }
-   }
-
-   FILE *file = fopen("./o.txt", "w , ccs=UTF-8");
-   for (int i = 0; i < processNamesCount; i++) {
-      fwprintf(file,L"%ls\n",processNames[i]);
-   }
-
-   return 0;
+   return DefWindowProc(hWindow, uMsg, wParam, lParam);
 }

@@ -7,7 +7,7 @@ RESCFLAGS = -O coff
 INC = -I .\include
 LIB = -L .\lib
 
-SRCS = main.c
+SRCS = main.c winutils.c
 RESRCS = icon.rc
 OBJS = $(SRCS:%.c=%.o)
 REOBJS = $(RESRCS:%.rc=%.res)
