@@ -18,4 +18,4 @@
 #include <windows.h>
 #include <Psapi.h>
 
-int getProcesses(DWORD *processes, wchar_t **process_names, int process_count);
+errno_t getProcesses(DWORD *processes, wchar_t **process_names, int process_count);
