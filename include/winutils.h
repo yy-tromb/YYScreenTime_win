@@ -1,3 +1,5 @@
+#pragma once
+
 #define UNICODE 1
 #define _UNICODE 1
 #ifndef __STDC_ISO_10646__
@@ -16,4 +18,4 @@
 #include <windows.h>
 #include <Psapi.h>
 
-int getProcesses(DWORD *processes, TCHAR **process_names, int process_count);
+int getProcesses(DWORD *processes, wchar_t **process_names, int process_count);

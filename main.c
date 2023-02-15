@@ -21,6 +21,7 @@
 
 #include "./include/winAPI_highDPI.h"
 #include "./include/winutils.h"
+#include "./include/strutil.h"
 
 LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -31,8 +32,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
    HWND hWindow;
    MSG message;
    FILE* file = fopen("./o.txt", "w,ccs=UTF-8");
-   DWORD allProcesses;
-   TCHAR** allProcessesNames;
+   DWORD *allProcesses;
+   wchar_t** allProcessesNames;
    int processes_count;
    getProcesses(allProcesses, allProcessesNames, processes_count);
    int i;
@@ -80,7 +81,6 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam) 
          LPCREATESTRUCT lpcs;
          wchar_t message_CREATE[512];
          lpcs = (LPCREATESTRUCT)lParam;
-         wchar_t tmp[6];
          swprintf_s(message_CREATE, sizeof(message_CREATE) / 2,
                     L"lpszClass: %ls\nlpszName: %ls\n"
                     L"x: %d\ny: %d\ncx: %d\ncy: %d\n",

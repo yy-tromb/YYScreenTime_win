@@ -1,6 +1,6 @@
 #include "./include/winutils.h"
 
-int getProcesses(DWORD *allProcesses, TCHAR **allProcessesNames, int allProcesses_count) {
+int getProcesses(DWORD *allProcesses, wchar_t **allProcessesNames, int allProcesses_count) {
    DWORD allProcesses_size;
    DWORD neededSize;
    int count=0;
