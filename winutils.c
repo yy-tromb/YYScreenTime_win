@@ -1,5 +1,8 @@
 #include "./include/winutils.h"
 
+//共有はしない
+BOOL CALLBACK EnumWindowsProc(HWND hwnd , LPARAM lParam);
+
 errno_t getProcesses(DWORD *allProcesses, wchar_t **allProcessesNames, int allProcesses_count) {
    DWORD allProcesses_size;
    DWORD neededSize;
@@ -70,3 +73,7 @@ errno_t getProcesses(DWORD *allProcesses, wchar_t **allProcessesNames, int allPr
 errno_t getWindowHandles(HWND *hWindows,size_t windows_count){
    //
 }
+
+BOOL CALLBACK EnumWindowsProc(HWND hwnd , LPARAM lParam){
+   //
+};
