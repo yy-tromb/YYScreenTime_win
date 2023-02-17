@@ -92,8 +92,13 @@ errno_t getWindowHandles(HWND *hWindows, size_t hWindows_count) {
 
 BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
    static int count = 0;
+   static HWND *hWindows_heap;
    struct EnumWindowProcData *enumWindowProcDataP = (struct EnumWindowProcData*)lParam;
-   enumWindowProcDataP;
+   static heap_count = enumWindowProcDataP->hWindows_count;
    count++;
+   if(count > heap_count){
+      //
+   }
+   enumWindowProcDataP;
    enumWindowProcDataP->hWindows_count=count;
 };
