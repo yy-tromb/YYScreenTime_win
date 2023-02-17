@@ -97,7 +97,8 @@ BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
    static heap_count = enumWindowProcDataP->hWindows_count;
    count++;
    if(count > heap_count){
-      //
+      heap_count+=1024;
+      realloc(hWindows,heap_count);
    }
    enumWindowProcDataP;
    enumWindowProcDataP->hWindows_count=count;
