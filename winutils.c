@@ -70,18 +70,24 @@ errno_t getProcesses(DWORD *allProcesses, wchar_t **allProcessesNames,
 
 // 共有はしない
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
+
 struct EnumWindowProcData {
    HWND *hWindows;
    size_t hWindows_count;
+   errno_t error;
 };
 
 errno_t getWindowHandles(HWND *hWindows, size_t hWindows_count) {
    struct EnumWindowProcData enumWindowProcData;
    enumWindowProcData.hWindows_count = 1024;
-   EnumWindows(EnumWindowsProc,(LPARAM)&enumWindowProcData);
-   char hoge[256];
-   sprintf(hoge,"%d",enumWindowProcData.hWindows_count);
-   MessageBoxA(NULL,hoge,"",MB_OK);
+   BOOL enunWindowError = EnumWindows(EnumWindowsProc,(LPARAM)&enumWindowProcData);
+   hWindows = enumWindowProcData.hWindows;
+   hWindows_count = enumWindowProcData.hWindows_count;
+   if(enunWindowError == 0){
+      return (errno_t)GetLastError();
+   }else{
+      return EXIT_SUCCESS;
+   }
 }
 
 BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
