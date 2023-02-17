@@ -99,7 +99,12 @@ BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
    if(count > heap_count){
       heap_count+=1024;
       realloc(hWindows,heap_count);
+      if(hWindows == NULL){
+         enumWindowProcDataP->error=EXIT_FAILURE;
+         return FALSE;
+      }
    }
    enumWindowProcDataP;
+   enumWindowPro
    enumWindowProcDataP->hWindows_count=count;
 };
