@@ -1,12 +1,5 @@
 #include "./include/winutils.h"
 
-// 共有はしない
-BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
-struct EnumWindowProcData {
-   HWND *hWindows;
-   size_t hWindows_count;
-};
-
 errno_t getProcesses(DWORD *allProcesses, wchar_t **allProcessesNames,
                      int allProcesses_count) {
    DWORD allProcesses_size;
@@ -75,6 +68,13 @@ errno_t getProcesses(DWORD *allProcesses, wchar_t **allProcessesNames,
    return EXIT_SUCCESS;
 }
 
+// 共有はしない
+BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
+struct EnumWindowProcData {
+   HWND *hWindows;
+   size_t hWindows_count;
+};
+
 errno_t getWindowHandles(HWND *hWindows, size_t hWindows_count) {
    struct EnumWindowProcData enumWindowProcData;
    enumWindowProcData.hWindows_count = 1024;
@@ -87,7 +87,7 @@ errno_t getWindowHandles(HWND *hWindows, size_t hWindows_count) {
 BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
    static int count = 0;
    struct EnumWindowProcData *enumWindowProcDataP = (struct EnumWindowProcData*)lParam;
-   //
+   enumWindowProcDataP;
    count++;
    enumWindowProcDataP->hWindows_count=count;
 };
