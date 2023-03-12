@@ -32,7 +32,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
    WNDCLASS wndClass;
    HWND hWindow;
    MSG message;
-   FILE* file = fopen("./o.txt", "w,ccs=UTF-8");
+   FILE* file;
+   errno_t error=fopen_s(&file,"./o.txt", "w,ccs=UTF-8");
    HWND *hWindows;
    size_t hWindows_count;
    /*
