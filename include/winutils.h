@@ -19,4 +19,4 @@
 #include <Psapi.h>
 
 errno_t getProcesses(DWORD *processes, wchar_t **process_names, int process_count);
-errno_t getWindowHandles(HWND *hWindow,size_t windows_count);
+errno_t getWindowHandles(HWND *hWindows,size_t *hWindows_count);

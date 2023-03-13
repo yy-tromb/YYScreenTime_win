@@ -1,5 +1,7 @@
 #include "./include/winutils.h"
 
+#define HEAP_COUNT 1024
+
 errno_t getProcesses(DWORD *allProcesses, wchar_t **allProcessesNames,
                      int allProcesses_count) {
    DWORD allProcesses_size;
@@ -74,37 +76,62 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
 struct EnumWindowProcData {
    HWND *hWindows;
    size_t hWindows_count;
+   size_t heap_count;
    errno_t error;
 };
 
-errno_t getWindowHandles(HWND *hWindows, size_t hWindows_count) {
+errno_t getWindowHandles(HWND *hWindows, size_t *hWindows_countP) {
    struct EnumWindowProcData enumWindowProcData;
-   enumWindowProcData.hWindows_count = 1024;
-   BOOL enunWindowError = EnumWindows(EnumWindowsProc,(LPARAM)&enumWindowProcData);
-   hWindows = enumWindowProcData.hWindows;
-   hWindows_count = enumWindowProcData.hWindows_count;
-   if(enunWindowError == 0){
-      return (errno_t)GetLastError();
+   enumWindowProcData.hWindows=(HWND*)calloc(sizeof(HWND)*HEAP_COUNT,sizeof(HWND));
+   if(enumWindowProcData.hWindows==NULL){
+      return ERROR_NOT_ENOUGH_MEMORY;
    }else{
-      return EXIT_SUCCESS;
+      enumWindowProcData.hWindows_count = 0;
+      enumWindowProcData.heap_count=HEAP_COUNT;
+      enumWindowProcData.hWindows_count=0;
+      enumWindowProcData.error=0;
+      WINBOOL enunWindowError = EnumWindows(EnumWindowsProc,(LPARAM)&enumWindowProcData);
+      hWindows = enumWindowProcData.hWindows;
+      *hWindows_countP = enumWindowProcData.hWindows_count;
+      if(enunWindowError == 0){
+         if(enumWindowProcData.error>0){
+            return enumWindowProcData.error;
+         }else{
+         return (errno_t)GetLastError();
+         }
+      }else{
+         //debug
+         char hoge[256];
+         sprintf(hoge,"%d",*hWindows_countP);
+         MessageBoxA(NULL,hoge,"",NULL);
+         //debug end
+         return EXIT_SUCCESS;
+      }
    }
 }
 
 BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
    static int count = 0;
-   static HWND *hWindows_heap;
+   static HWND *hWindows;
    struct EnumWindowProcData *enumWindowProcDataP = (struct EnumWindowProcData*)lParam;
-   static heap_count = enumWindowProcDataP->hWindows_count;
-   count++;
+   int heap_count = enumWindowProcDataP->heap_count;
+   hWindows=enumWindowProcDataP->hWindows;
    if(count > heap_count){
       heap_count+=1024;
-      realloc(hWindows,heap_count);
-      if(hWindows == NULL){
-         enumWindowProcDataP->error=EXIT_FAILURE;
+      enumWindowProcDataP->heap_count=heap_count;
+      hWindows=realloc(hWindows,heap_count);
+      if(hWindows==NULL){
+         enumWindowProcDataP->error=ERROR_NOT_ENOUGH_MEMORY;
          return FALSE;
+      }else{
+         enumWindowProcDataP->hWindows=hWindows;
       }
+   }else{
+      if(hWindow != NULL){
+            hWindows[count++]=hWindow;
+            enumWindowProcDataP->hWindows_count=count;
+         }else{
+            return TRUE; //continue
+         }
    }
-   enumWindowProcDataP;
-   enumWindowPro
-   enumWindowProcDataP->hWindows_count=count;
 };

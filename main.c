@@ -45,7 +45,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
    for (i = 0; i < processes_count; i++) {
       fwprintf(file, allProcessesNames[i]);
    }*/
-   getWindowHandles(hWindows,hWindows_count);
+   errno_t getWindowHandles_error = getWindowHandles(hWindows,&hWindows_count);
+   char hoge[1024];
+   sprintf(hoge,"error:%d count:%u",getWindowHandles_error,hWindows_count);
+   MessageBoxA(NULL,hoge,"",NULL);
    fclose(file);
 
    wndClass.style = CS_HREDRAW | CS_VREDRAW;
