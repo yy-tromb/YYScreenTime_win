@@ -64,7 +64,7 @@ if(file_error != 0){
       char hoge[256];
       sprintf(hoge,"%d\n", all_processes_count);
       MessageBoxA(NULL, hoge, "", MB_OK);
-      fwprintf(file, L"%ls",processName);
+      fwprintf(file, L"%ls\n",processName);
       }
 
 
