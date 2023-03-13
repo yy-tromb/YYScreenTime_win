@@ -7,20 +7,23 @@ errno_t getProcesses(DWORD *all_processes, unsigned int *all_processes_count) {
    DWORD neededSize;
    DWORD *allProcesses_tmp=NULL;
 
-      for (allProcesses_size = 2048; allProcesses_size <= 65536;
+      for (allProcesses_size = 4096; allProcesses_size <= 65536;
             allProcesses_size <<= 1) {
-      allProcesses_tmp=(DWORD*)realloc(allProcesses_tmp,sizeof(DWORD)*allProcesses_size);
+      allProcesses_tmp=(DWORD*)realloc(allProcesses_tmp,allProcesses_size);
       neededSize = 0;
       if (EnumProcesses(allProcesses_tmp, allProcesses_size,
                         &neededSize) == 0) {
-         if (ERROR_INSUFFICIENT_BUFFER == GetLastError()) {
+         if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+            //debug
             char hoge[256] = "ee";
             MessageBoxA(NULL, hoge, "", MB_OK);
             continue;
          } else {
+            //debug
             char hoge[256]="e";
             MessageBoxA(NULL, hoge, "", MB_OK);
             all_processes = NULL;
+            free(allProcesses_tmp);
             return (errno_t)GetLastError();
          }
       } else {
@@ -59,9 +62,11 @@ errno_t getProcessName(DWORD processID, wchar_t *exeName) {
          }
       }
       CloseHandle(hProcess);
+      //debug
       MessageBoxA(NULL, "gpn", "", MB_OK);
       return EXIT_SUCCESS;
    } else {
+      //debug
       //MessageBoxA(NULL, "err2", "", MB_OK);
       return (errno_t)GetLastError();
    }
