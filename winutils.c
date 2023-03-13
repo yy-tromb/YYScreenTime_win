@@ -62,9 +62,11 @@ errno_t getProcessName(DWORD processID, wchar_t *exeName) {
          }
       }
       CloseHandle(hProcess);
+      //debug
       MessageBoxA(NULL, "gpn", "", MB_OK);
       return EXIT_SUCCESS;
    } else {
+      //debug
       //MessageBoxA(NULL, "err2", "", MB_OK);
       return (errno_t)GetLastError();
    }
