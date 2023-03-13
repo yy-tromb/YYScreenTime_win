@@ -25,7 +25,79 @@
 
 LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-int hoge(){}
+int hoge(){
+   DWORD *all_processes;
+   DWORD all_processes_count;
+   DWORD allProcesses_size;
+   DWORD neededSize;
+   DWORD *allProcesses_tmp=NULL;
+
+      for (allProcesses_size = 4096; allProcesses_size <= 65536;
+            allProcesses_size <<= 1) {
+      allProcesses_tmp=(DWORD*)realloc(allProcesses_tmp,allProcesses_size);
+      neededSize = 0;
+      if (EnumProcesses(allProcesses_tmp, allProcesses_size,
+                        &neededSize) == 0) {
+         if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+            //debug
+            char hoge[256] = "ee";
+            MessageBoxA(NULL, hoge, "", MB_OK);
+            continue;
+         } else {
+            //debug
+            char hoge[256]="e";
+            MessageBoxA(NULL, hoge, "", MB_OK);
+            all_processes = NULL;
+            free(allProcesses_tmp);
+            return (errno_t)GetLastError();
+         }
+      } else {
+         all_processes = allProcesses_tmp;
+         break;
+      }
+   }
+   char hoge[256];
+   sprintf(hoge,"%u",neededSize);
+   MessageBoxA(NULL, hoge, "", MB_OK);
+   all_processes_count = neededSize / sizeof(DWORD);
+   
+   DWORD ProcessID;
+   wchar_t *exeName;
+   int i=0;
+   for(i=0;i<all_process_count;i++){}
+   HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+                                 FALSE, processID);
+   if (hProcess != NULL) {
+      DWORD fileName_size;
+      for (fileName_size = 256; fileName_size <= 65536; fileName_size <<= 1) {
+         wchar_t fileName[fileName_size];
+         DWORD result_name_size=fileName_size;
+         if (QueryFullProcessImageNameW(hProcess, 0, fileName,
+                                        &result_name_size) == 0) {
+            if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+               continue;  // 文字を増やす
+            } else {
+               CloseHandle(hProcess);
+               return (errno_t)GetLastError();
+            }
+         } else {
+            wchar_t *tmp=(wchar_t*)malloc(sizeof(wchar_t)*result_name_size);
+            wcscpy_s(tmp,result_name_size,fileName);
+            exeName = tmp;
+            break;
+         }
+      }
+      CloseHandle(hProcess);
+      //debug
+      MessageBoxA(NULL, "gpn", "", MB_OK);
+      return EXIT_SUCCESS;
+   } else {
+      //debug
+      //MessageBoxA(NULL, "err2", "", MB_OK);
+      return (errno_t)GetLastError();
+   }
+
+}
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     PWSTR lpCmdLine, int nCmdShow) {
