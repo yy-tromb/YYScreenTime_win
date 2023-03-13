@@ -5,7 +5,7 @@
 errno_t getProcesses(DWORD *all_processes, unsigned int *all_processes_count) {
    DWORD allProcesses_size;
    DWORD neededSize;
-   DWORD *allProcesses_tmp=NULL;
+   DWORD allProcesses_tmp=NULL;
 
       for (allProcesses_size = 2048; allProcesses_size <= 65536;
             allProcesses_size <<= 1) {
