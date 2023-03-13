@@ -18,5 +18,7 @@
 #include <windows.h>
 #include <Psapi.h>
 
-errno_t getProcesses(DWORD *processes, wchar_t **process_names, int process_count);
-errno_t getWindowHandles(HWND *hWindows,size_t *hWindows_count);
+errno_t getProcesses(DWORD *all_processes, unsigned int *process_count);
+errno_t getProcessName(DWORD processID, wchar_t *exeName);
+errno_t getWindowHandles(HWND *hWindows, size_t *hWindows_count);
+errno_t getHWindowPID(HWND *hWindow,DWORD *processID);

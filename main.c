@@ -25,30 +25,57 @@
 
 LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine,
-                   int nCmdShow) {
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+                    PWSTR lpCmdLine, int nCmdShow) {
    winAPI_highDPI();
    const wchar_t appName[] = L"mytest";
    WNDCLASS wndClass;
    HWND hWindow;
    MSG message;
-   FILE* file;
-   errno_t error=fopen_s(&file,"./o.txt", "w,ccs=UTF-8");
+   FILE *file;
+   errno_t file_error = fopen_s(&file, "./o.txt", "w,ccs=UTF-8");
+if(file_error != 0){
+   char hoge[256];
+   sprintf("file error:%d", file_error);
+   MessageBoxA(NULL, hoge, "", MB_OK);
+}
+   DWORD *all_processes;
+   unsigned int all_processes_count=0;
+   errno_t getProcesses_error=getProcesses(all_processes, &all_processes_count);
+   if(getProcesses_error != 0){
+      char hoge[256];
+      sprintf("getProcesses error:%d", getProcesses_error);
+      MessageBoxA(NULL, hoge, "", MB_OK);
+   }
+   int i;
+   FILE *f=fopen("./f.txt", "w+");
+   for (i = 0; i < all_processes_count; i++) {
+      fprintf(f, "%ld", all_processes[i]);
+      wchar_t *processName;
+      errno_t getProcessName_error = getProcessName(all_processes[i], processName);
+      if (getProcessName_error != 0) {
+         if(getProcessName_error==5){
+            continue;
+         }
+         continue;
+         char hoge[256];
+         sprintf(hoge,"%d", getProcessName_error);
+         MessageBoxA(NULL, hoge, "", MB_OK);
+      }else{
+      char hoge[256];
+      sprintf(hoge,"%d\n", all_processes_count);
+      MessageBoxA(NULL, hoge, "", MB_OK);
+      fwprintf(file, L"%ls",processName);
+      }
+
+
+   }
+   fclose(f);
+
    HWND *hWindows;
    size_t hWindows_count;
-   /*
-   DWORD *allProcesses;
-   wchar_t** allProcessesNames;
-   int processes_count;
-   getProcesses(allProcesses, allProcessesNames, processes_count);
-   int i;
-   for (i = 0; i < processes_count; i++) {
-      fwprintf(file, allProcessesNames[i]);
-   }*/
-   errno_t getWindowHandles_error = getWindowHandles(hWindows,&hWindows_count);
-   char hoge[1024];
-   sprintf(hoge,"error:%d count:%u",getWindowHandles_error,hWindows_count);
-   MessageBoxA(NULL,hoge,"",NULL);
+   errno_t getWindowHandles_error = getWindowHandles(hWindows, &hWindows_count);
+
    fclose(file);
 
    wndClass.style = CS_HREDRAW | CS_VREDRAW;
@@ -67,8 +94,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
    }
 
    hWindow = CreateWindowW(appName, L"yyhome-tromb test", WS_OVERLAPPEDWINDOW,
-                       CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                       CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+                           CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+                           CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
 
    if (!hWindow) {
       return 0;
@@ -85,9 +112,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
    return message.wParam;
 }
 
-LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-   static int MOVE_x,MOVE_y;
-   static int SIZE_x,SIZE_y;
+LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
+                         LPARAM lParam) {
+   static int MOVE_x, MOVE_y;
+   static int SIZE_x, SIZE_y;
    switch (uMsg) {
       case WM_CREATE:
          LPCREATESTRUCT lpcs;
@@ -121,8 +149,9 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam) 
          return 0;
 
       case WM_CLOSE:
-         int messageboxID = MessageBox(hWindow, L"本当に終了しますか？", L"終了の確認",
-                                   MB_YESNO | MB_ICONWARNING);
+         int messageboxID =
+             MessageBox(hWindow, L"本当に終了しますか？", L"終了の確認",
+                        MB_YESNO | MB_ICONWARNING);
          if (messageboxID == IDYES) {
             DestroyWindow(hWindow);
          }

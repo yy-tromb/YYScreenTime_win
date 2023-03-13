@@ -61,3 +61,5 @@ foo*.*
 .vscode/
 o.txt
 !/lib/*.a
+
+/YYScreenTime_win*/
