@@ -57,7 +57,6 @@ if(file_error != 0){
          if(getProcessName_error==5){
             continue;
          }
-         continue;
          char hoge[256];
          sprintf(hoge,"%d", getProcessName_error);
          MessageBoxA(NULL, hoge, "", MB_OK);
