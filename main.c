@@ -25,6 +25,8 @@
 
 LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+int hoge(){}
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     PWSTR lpCmdLine, int nCmdShow) {
    winAPI_highDPI();
@@ -70,6 +72,7 @@ if(file_error != 0){
 
    }
    fclose(f);
+   hoge();
 
    HWND *hWindows;
    size_t hWindows_count;
