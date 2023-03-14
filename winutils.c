@@ -5,34 +5,36 @@
 errno_t getProcesses(DWORD *all_processes, unsigned int *all_processes_count) {
    DWORD allProcesses_size;
    DWORD neededSize;
-   DWORD *allProcesses_tmp=NULL;
+   DWORD *allProcesses_tmp = NULL;
 
-      for (allProcesses_size = 4096; allProcesses_size <= 65536;
-            allProcesses_size <<= 1) {
-      allProcesses_tmp=(DWORD*)realloc(allProcesses_tmp,allProcesses_size);
+   for (allProcesses_size = 4096; allProcesses_size <= 65536;
+        allProcesses_size <<= 1) {
+      allProcesses_tmp = (DWORD *)realloc(allProcesses_tmp, allProcesses_size);
       neededSize = 0;
-      if (EnumProcesses(allProcesses_tmp, allProcesses_size,
-                        &neededSize) == 0) {
-         if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
-            //debug
-            char hoge[256] = "ee";
-            MessageBoxA(NULL, hoge, "", MB_OK);
-            continue;
-         } else {
-            //debug
-            char hoge[256]="e";
-            MessageBoxA(NULL, hoge, "", MB_OK);
-            all_processes = NULL;
-            free(allProcesses_tmp);
-            return (errno_t)GetLastError();
-         }
+      if (EnumProcesses(allProcesses_tmp, allProcesses_size, &neededSize) ==
+          0) {
+         MessageBoxA(NULL, "any error", "", MB_OK);
+         all_processes = NULL;
+         *all_processes_count = 0;
+         free(allProcesses_tmp);
+         return (errno_t)GetLastError();
       } else {
-         all_processes = allProcesses_tmp;
+         if (neededSize >= allProcesses_size) {
+            continue;  // メモリを増やす
+         }
+         MessageBoxA(NULL,"no err","",MB_OK);
          break;
       }
    }
-   char hoge[256];
-   sprintf(hoge,"%u",neededSize);
+   all_processes = allProcesses_tmp;
+   int i;
+   FILE *f=fopen("./ff.txt","w+");
+   for(i=0;i<neededSize/4;i++){
+      fprintf(f,"%ld\n",all_processes[i]);
+   }
+   fclose(f);
+   char hoge[64];
+   sprintf(hoge, "neededSize/4:%lu", neededSize/4);
    MessageBoxA(NULL, hoge, "", MB_OK);
    *all_processes_count = neededSize / sizeof(DWORD);
    return EXIT_SUCCESS;
@@ -45,7 +47,7 @@ errno_t getProcessName(DWORD processID, wchar_t *exeName) {
       DWORD fileName_size;
       for (fileName_size = 256; fileName_size <= 65536; fileName_size <<= 1) {
          wchar_t fileName[fileName_size];
-         DWORD result_name_size=fileName_size;
+         DWORD result_name_size = fileName_size;
          if (QueryFullProcessImageNameW(hProcess, 0, fileName,
                                         &result_name_size) == 0) {
             if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
@@ -55,19 +57,20 @@ errno_t getProcessName(DWORD processID, wchar_t *exeName) {
                return (errno_t)GetLastError();
             }
          } else {
-            wchar_t *tmp=(wchar_t*)malloc(sizeof(wchar_t)*result_name_size);
-            wcscpy_s(tmp,result_name_size,fileName);
+            wchar_t *tmp =
+                (wchar_t *)malloc(sizeof(wchar_t) * result_name_size);
+            wcscpy_s(tmp, result_name_size, fileName);
             exeName = tmp;
             break;
          }
       }
       CloseHandle(hProcess);
-      //debug
+      // debug
       MessageBoxA(NULL, "gpn", "", MB_OK);
       return EXIT_SUCCESS;
    } else {
-      //debug
-      //MessageBoxA(NULL, "err2", "", MB_OK);
+      // debug
+      // MessageBoxA(NULL, "err2", "", MB_OK);
       return (errno_t)GetLastError();
    }
 }
@@ -87,7 +90,7 @@ errno_t getWindowHandles(HWND *hWindows, size_t *hWindows_countP) {
    enumWindowProcData.hWindows =
        (HWND *)calloc(sizeof(HWND) * HEAP_COUNT, sizeof(HWND));
    if (enumWindowProcData.hWindows == NULL) {
-      return ERROR_NOT_ENOUGH_MEMORY;
+      return ERROR_INSUFFICIENT_BUFFER;
    } else {
       enumWindowProcData.hWindows_count = 0;
       enumWindowProcData.heap_count = HEAP_COUNT;
@@ -121,7 +124,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
       enumWindowProcDataP->heap_count = heap_count;
       hWindows = realloc(hWindows, heap_count);
       if (hWindows == NULL) {
-         enumWindowProcDataP->error = ERROR_NOT_ENOUGH_MEMORY;
+         enumWindowProcDataP->error = ERROR_INSUFFICIENT_BUFFER;
          return FALSE;
       } else {
          enumWindowProcDataP->hWindows = hWindows;
@@ -136,10 +139,10 @@ BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
    }
 };
 
-errno_t getHWindowPID(HWND *hWindow, DWORD *processID){
-   if ( GetWindowThreadProcessId(*hWindow,processID) == 0){
+errno_t getHWindowPID(HWND *hWindow, DWORD *processID) {
+   if (GetWindowThreadProcessId(*hWindow, processID) == 0) {
       return (errno_t)GetLastError();
-   }else{
+   } else {
       return EXIT_SUCCESS;
    }
 }

@@ -63,3 +63,6 @@ o.txt
 !/lib/*.a
 
 /YYScreenTime_win*/
+/f.txt
+/ff.txt
+/o.txt

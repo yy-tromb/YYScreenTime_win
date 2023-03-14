@@ -25,27 +25,27 @@
 
 LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-int hoge(){
+int hoge() {
    DWORD *all_processes;
    DWORD all_processes_count;
    DWORD allProcesses_size;
    DWORD neededSize;
-   DWORD *allProcesses_tmp=NULL;
+   DWORD *allProcesses_tmp = NULL;
 
-      for (allProcesses_size = 4096; allProcesses_size <= 65536;
-            allProcesses_size <<= 1) {
-      allProcesses_tmp=(DWORD*)realloc(allProcesses_tmp,allProcesses_size);
+   for (allProcesses_size = 4096; allProcesses_size <= 65536;
+        allProcesses_size <<= 1) {
+      allProcesses_tmp = (DWORD *)realloc(allProcesses_tmp, allProcesses_size);
       neededSize = 0;
-      if (EnumProcesses(allProcesses_tmp, allProcesses_size,
-                        &neededSize) == 0) {
+      if (EnumProcesses(allProcesses_tmp, allProcesses_size, &neededSize) ==
+          0) {
          if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
-            //debug
+            // debug
             char hoge[256] = "ee";
             MessageBoxA(NULL, hoge, "", MB_OK);
             continue;
          } else {
-            //debug
-            char hoge[256]="e";
+            // debug
+            char hoge[256] = "e";
             MessageBoxA(NULL, hoge, "", MB_OK);
             all_processes = NULL;
             free(allProcesses_tmp);
@@ -57,21 +57,21 @@ int hoge(){
       }
    }
    char hoge[256];
-   sprintf(hoge,"%u",neededSize);
+   sprintf(hoge, "%u", neededSize);
    MessageBoxA(NULL, hoge, "", MB_OK);
    all_processes_count = neededSize / sizeof(DWORD);
-   
-   DWORD ProcessID;
+
    wchar_t *exeName;
-   int i=0;
-   for(i=0;i<all_process_count;i++){}
+   int i = 0;
+   for (i = 0; i < all_processes_count; i++) {
+   }
    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-                                 FALSE, processID);
+                                 FALSE, all_processes[i]);
    if (hProcess != NULL) {
       DWORD fileName_size;
       for (fileName_size = 256; fileName_size <= 65536; fileName_size <<= 1) {
          wchar_t fileName[fileName_size];
-         DWORD result_name_size=fileName_size;
+         DWORD result_name_size = fileName_size;
          if (QueryFullProcessImageNameW(hProcess, 0, fileName,
                                         &result_name_size) == 0) {
             if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
@@ -81,22 +81,24 @@ int hoge(){
                return (errno_t)GetLastError();
             }
          } else {
-            wchar_t *tmp=(wchar_t*)malloc(sizeof(wchar_t)*result_name_size);
-            wcscpy_s(tmp,result_name_size,fileName);
-            exeName = tmp;
+            wchar_t *tmp =
+                (wchar_t *)malloc(sizeof(wchar_t) * result_name_size);
+            wcscpy_s(tmp, result_name_size, fileName);
+            MessageBoxW(NULL, tmp, L"", MB_OK);
+            free(tmp);
             break;
          }
       }
       CloseHandle(hProcess);
-      //debug
+      // debug
       MessageBoxA(NULL, "gpn", "", MB_OK);
       return EXIT_SUCCESS;
    } else {
-      //debug
-      //MessageBoxA(NULL, "err2", "", MB_OK);
+      // debug
+      // MessageBoxA(NULL, "err2", "", MB_OK);
       return (errno_t)GetLastError();
    }
-
+   return 0;
 }
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -108,43 +110,43 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    MSG message;
    FILE *file;
    errno_t file_error = fopen_s(&file, "./o.txt", "w,ccs=UTF-8");
-if(file_error != 0){
-   char hoge[256];
-   sprintf("file error:%d", file_error);
-   MessageBoxA(NULL, hoge, "", MB_OK);
-}
-   DWORD *all_processes;
-   unsigned int all_processes_count=0;
-   errno_t getProcesses_error=getProcesses(all_processes, &all_processes_count);
-   if(getProcesses_error != 0){
+   if (file_error != 0) {
       char hoge[256];
-      sprintf("getProcesses error:%d", getProcesses_error);
+      sprintf(hoge, "file error:%d", file_error);
       MessageBoxA(NULL, hoge, "", MB_OK);
+      return 1;
    }
+   DWORD *all_processes;
+   unsigned int all_processes_count = 0;
+   errno_t getProcesses_error =
+       getProcesses(all_processes, &all_processes_count);
+   char hoge[256];
+   sprintf(hoge, "getProcesses error:%d", getProcesses_error);
+   MessageBoxA(NULL, hoge, "", MB_OK);
+   char honi[256];
+   sprintf(honi, "allProcesses:%d", all_processes_count);
+   MessageBoxA(NULL, honi, "", MB_OK);
    int i;
-   FILE *f=fopen("./f.txt", "w+");
+   FILE *f = fopen("./f.txt", "w+");
    for (i = 0; i < all_processes_count; i++) {
-      fprintf(f, "%ld", all_processes[i]);
+      fprintf(f, "%ld\n", all_processes[i]);
       wchar_t *processName;
-      errno_t getProcessName_error = getProcessName(all_processes[i], processName);
+      errno_t getProcessName_error =
+          getProcessName(all_processes[i], processName);
       if (getProcessName_error != 0) {
-         if(getProcessName_error==5){
+         if (getProcessName_error == 5) {
             continue;
          }
+         continue;
          char hoge[256];
-         sprintf(hoge,"%d", getProcessName_error);
+         sprintf(hoge, "%d", getProcessName_error);
          MessageBoxA(NULL, hoge, "", MB_OK);
-      }else{
-      char hoge[256];
-      sprintf(hoge,"%d\n", all_processes_count);
-      MessageBoxA(NULL, hoge, "", MB_OK);
-      fwprintf(file, L"%ls\n",processName);
+      } else {
+         fwprintf(file, L"%ls\n", processName);
       }
-
-
    }
    fclose(f);
-   hoge();
+   // hoge();
 
    HWND *hWindows;
    size_t hWindows_count;
