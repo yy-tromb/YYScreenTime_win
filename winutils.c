@@ -2,7 +2,7 @@
 
 #define HEAP_COUNT 1024
 
-errno_t getProcesses(DWORD *all_processes, unsigned int *all_processes_count) {
+errno_t getProcesses(DWORD **all_processes, unsigned int *all_processes_count) {
    DWORD allProcesses_size;
    DWORD neededSize;
    DWORD *allProcesses_tmp = NULL;
@@ -14,7 +14,7 @@ errno_t getProcesses(DWORD *all_processes, unsigned int *all_processes_count) {
       if (EnumProcesses(allProcesses_tmp, allProcesses_size, &neededSize) ==
           0) {
          MessageBoxA(NULL, "any error", "", MB_OK);
-         all_processes = NULL;
+         *all_processes = NULL;
          *all_processes_count = 0;
          free(allProcesses_tmp);
          return (errno_t)GetLastError();
@@ -26,13 +26,7 @@ errno_t getProcesses(DWORD *all_processes, unsigned int *all_processes_count) {
          break;
       }
    }
-   all_processes = allProcesses_tmp;
-   int i;
-   FILE *f=fopen("./ff.txt","w+");
-   for(i=0;i<neededSize/4;i++){
-      fprintf(f,"%ld\n",all_processes[i]);
-   }
-   fclose(f);
+   *all_processes = allProcesses_tmp;
    char hoge[64];
    sprintf(hoge, "neededSize/4:%lu", neededSize/4);
    MessageBoxA(NULL, hoge, "", MB_OK);
@@ -40,7 +34,7 @@ errno_t getProcesses(DWORD *all_processes, unsigned int *all_processes_count) {
    return EXIT_SUCCESS;
 }
 
-errno_t getProcessName(DWORD processID, wchar_t *exeName) {
+errno_t getProcessName(DWORD processID, wchar_t **processName) {
    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
                                  FALSE, processID);
    if (hProcess != NULL) {
@@ -60,17 +54,15 @@ errno_t getProcessName(DWORD processID, wchar_t *exeName) {
             wchar_t *tmp =
                 (wchar_t *)malloc(sizeof(wchar_t) * result_name_size);
             wcscpy_s(tmp, result_name_size, fileName);
-            exeName = tmp;
+            *processName = tmp;
             break;
          }
       }
       CloseHandle(hProcess);
-      // debug
-      MessageBoxA(NULL, "gpn", "", MB_OK);
       return EXIT_SUCCESS;
    } else {
-      // debug
-      // MessageBoxA(NULL, "err2", "", MB_OK);
+      *processName=NULL;
+      //MessageBoxA(NULL,"OpenProcess error","",MB_OK);
       return (errno_t)GetLastError();
    }
 }
@@ -85,7 +77,7 @@ struct EnumWindowProcData {
    errno_t error;
 };
 
-errno_t getWindowHandles(HWND *hWindows, size_t *hWindows_countP) {
+errno_t getWindowHandles(HWND **hWindows, size_t *hWindows_countP) {
    struct EnumWindowProcData enumWindowProcData;
    enumWindowProcData.hWindows =
        (HWND *)calloc(sizeof(HWND) * HEAP_COUNT, sizeof(HWND));
@@ -98,7 +90,7 @@ errno_t getWindowHandles(HWND *hWindows, size_t *hWindows_countP) {
       enumWindowProcData.error = 0;
       WINBOOL enunWindowError =
           EnumWindows(EnumWindowsProc, (LPARAM)&enumWindowProcData);
-      hWindows = enumWindowProcData.hWindows;
+      *hWindows = enumWindowProcData.hWindows;
       *hWindows_countP = enumWindowProcData.hWindows_count;
       if (enunWindowError == 0) {
          if (enumWindowProcData.error > 0) {
