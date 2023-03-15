@@ -22,14 +22,10 @@ errno_t getProcesses(DWORD **all_processes, unsigned int *all_processes_count) {
          if (neededSize >= allProcesses_size) {
             continue;  // メモリを増やす
          }
-         MessageBoxA(NULL,"no err","",MB_OK);
          break;
       }
    }
    *all_processes = allProcesses_tmp;
-   char hoge[64];
-   sprintf(hoge, "neededSize/4:%lu", neededSize/4);
-   MessageBoxA(NULL, hoge, "", MB_OK);
    *all_processes_count = neededSize / sizeof(DWORD);
    return EXIT_SUCCESS;
 }
@@ -39,8 +35,9 @@ errno_t getProcessName(DWORD processID, wchar_t **processName) {
                                  FALSE, processID);
    if (hProcess != NULL) {
       DWORD fileName_size;
+      wchar_t *fileName=NULL;
       for (fileName_size = 256; fileName_size <= 65536; fileName_size <<= 1) {
-         wchar_t fileName[fileName_size];
+         fileName=(wchar_t*)realloc(fileName,sizeof(wchar_t)*fileName_size);
          DWORD result_name_size = fileName_size;
          if (QueryFullProcessImageNameW(hProcess, 0, fileName,
                                         &result_name_size) == 0) {
@@ -51,10 +48,7 @@ errno_t getProcessName(DWORD processID, wchar_t **processName) {
                return (errno_t)GetLastError();
             }
          } else {
-            wchar_t *tmp =
-                (wchar_t *)malloc(sizeof(wchar_t) * result_name_size);
-            wcscpy_s(tmp, result_name_size, fileName);
-            *processName = tmp;
+            *processName = fileName;
             break;
          }
       }
@@ -62,7 +56,6 @@ errno_t getProcessName(DWORD processID, wchar_t **processName) {
       return EXIT_SUCCESS;
    } else {
       *processName=NULL;
-      //MessageBoxA(NULL,"OpenProcess error","",MB_OK);
       return (errno_t)GetLastError();
    }
 }
@@ -131,8 +124,8 @@ BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
    }
 };
 
-errno_t getHWindowPID(HWND *hWindow, DWORD *processID) {
-   if (GetWindowThreadProcessId(*hWindow, processID) == 0) {
+errno_t getHWindowPID(HWND hWindow, DWORD *processID) {
+   if (GetWindowThreadProcessId(hWindow, processID) == 0) {
       return (errno_t)GetLastError();
    } else {
       return EXIT_SUCCESS;

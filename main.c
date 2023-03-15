@@ -63,16 +63,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       errno_t getProcessName_error =
           getProcessName(all_processes[i], &processName);
       if (getProcessName_error != 0) {
-         fwprintf_s(log,L"error:%d @getProcessName\n",getProcessName_error);
-         if (getProcessName_error == 5) {
+         if(getProcessName_error == 5){
+            fwprintf_s(log, L"error:5 (ERROR_ACCESS_DENIED) @getProcessName\n",
+                       getProcessName_error);
             continue;
          }
-         continue;
-         char hoge[256];
-         sprintf(hoge, "%d", getProcessName_error);
-         MessageBoxA(NULL, hoge, "", MB_OK);
+         fwprintf_s(log,L"error:%d @getProcessName\n",getProcessName_error);
       } else {
-         //MessageBoxW(NULL,processName,L"",MB_OK);
          fwprintf(o_txt, L"%ls\n", processName);
       }
    }
