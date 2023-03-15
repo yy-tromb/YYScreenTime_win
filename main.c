@@ -32,16 +32,25 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    WNDCLASS wndClass;
    HWND hWindow;
    MSG message;
-   FILE *o_txt;
+   FILE *processes_out;
+   FILE *windows_out;
    FILE *log;
-   errno_t file_error = fopen_s(&o_txt, "./o.txt", "w,ccs=UTF-8");
+   errno_t file_error =
+       fopen_s(&processes_out, "./processes.txt", "w,ccs=UTF-8");
    if (file_error != 0) {
       char hoge[64];
       sprintf(hoge, "file error:%d", file_error);
       MessageBoxA(NULL, hoge, "", MB_OK);
       return 1;
    }
-   errno_t log_error = fopen_s(&log, "./log.txt", "w+,ccs=UTF-8");
+   file_error = fopen_s(&windows_out, "./windows.txt", "w,ccs=UTF-8");
+   if (file_error != 0) {
+      char hoge[64];
+      sprintf(hoge, "file error:%d", file_error);
+      MessageBoxA(NULL, hoge, "", MB_OK);
+      return 1;
+   }
+   errno_t log_error = fopen_s(&log, "./log.txt", "w,ccs=UTF-8");
    if (log_error != 0) {
       return 1;
    } else {
@@ -53,32 +62,54 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    unsigned int all_processes_count = 0;
    errno_t getProcesses_error =
        getProcesses(&all_processes, &all_processes_count);
-   if (getProcesses_error > 0) {
-      fwprintf_s(log, L"error:%d @getProcesses\n", getProcesses_error);
-   }
-   int i;
-   for (i = 0; i < all_processes_count; i++) {
-      wchar_t *processName;
-      errno_t getProcessName_error =
-          getProcessName(all_processes[i], &processName);
-      if (getProcessName_error != 0) {
-         if (getProcessName_error == 5) {
-            fwprintf_s(log, L"error:5 (ERROR_ACCESS_DENIED) @getProcessName\n",
-                       getProcessName_error);
-            continue;
+   if (getProcesses_error != 0) {
+      fwprintf_s(log, L"error:%d @getProcesses line:%d\n", getProcesses_error,
+                 __LINE__);
+   } else {
+      int i;
+      for (i = 0; i < all_processes_count; i++) {
+         wchar_t *processName;
+         errno_t getProcessName_error =
+             getProcessName(all_processes[i], &processName);
+         if (getProcessName_error != 0) {
+            fwprintf_s(log, L"error:%d @getProcessName line:%d\n",
+                       getProcessName_error, __LINE__);
+         } else {
+            fwprintf_s(processes_out, L"%ls\n", processName);
          }
-         fwprintf_s(log, L"error:%d @getProcessName\n", getProcessName_error);
-      } else {
-         fwprintf(o_txt, L"%ls\n", processName);
       }
    }
+   fclose(processes_out);
 
    HWND *hWindows;
    size_t hWindows_count;
    errno_t getWindowHandles_error =
        getWindowHandles(&hWindows, &hWindows_count);
-
-   fclose(o_txt);
+   if (getWindowHandles_error != 0) {
+      fwprintf_s(log, L"error:%d @getWindowHandles line:%d\n",
+                 getWindowHandles_error, __LINE__);
+   } else {
+      int i;
+      for (i = 0; i < hWindows_count; i++) {
+         DWORD processID;
+         errno_t getHWindowPID_error = getHWindowPID(hWindows[i], &processID);
+         if (getHWindowPID_error != 0) {
+            fwprintf_s(log, L"error:%d @getHWindowPID line:%d\n",
+                       getHWindowPID_error, __LINE__);
+         } else {
+            wchar_t *processName;
+            errno_t getProcessName_error =
+                getProcessName(processID, &processName);
+            if (getProcessName_error != 0) {
+               fwprintf_s(log, L"error:%d @getProcessName line:%d\n",
+                          getProcessName_error, __LINE__);
+            } else {
+               fwprintf_s(windows_out, L"%ls\n", processName);
+            }
+         }
+      }
+   }
+   fclose(windows_out);
 
    wndClass.style = CS_HREDRAW | CS_VREDRAW;
    wndClass.lpfnWndProc = WndProc;
