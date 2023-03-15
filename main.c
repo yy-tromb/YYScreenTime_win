@@ -41,21 +41,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       MessageBoxA(NULL, hoge, "", MB_OK);
       return 1;
    }
-   errno_t log_error=fopen_s(&log,"./log.txt","w+,ccs=UTF-8");
-   if(log_error != 0){
+   errno_t log_error = fopen_s(&log, "./log.txt", "w+,ccs=UTF-8");
+   if (log_error != 0) {
       return 1;
-   }else{
-      fputws(L"Start log...\n",log);
+   } else {
+      fputws(L"Start log...\n", log);
       fflush(log);
    }
-
 
    DWORD *all_processes;
    unsigned int all_processes_count = 0;
    errno_t getProcesses_error =
        getProcesses(&all_processes, &all_processes_count);
-   if(getProcesses_error > 0){
-      fwprintf_s(log,L"error:%d @getProcesses\n",getProcesses_error);
+   if (getProcesses_error > 0) {
+      fwprintf_s(log, L"error:%d @getProcesses\n", getProcesses_error);
    }
    int i;
    for (i = 0; i < all_processes_count; i++) {
@@ -63,12 +62,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       errno_t getProcessName_error =
           getProcessName(all_processes[i], &processName);
       if (getProcessName_error != 0) {
-         if(getProcessName_error == 5){
+         if (getProcessName_error == 5) {
             fwprintf_s(log, L"error:5 (ERROR_ACCESS_DENIED) @getProcessName\n",
                        getProcessName_error);
             continue;
          }
-         fwprintf_s(log,L"error:%d @getProcessName\n",getProcessName_error);
+         fwprintf_s(log, L"error:%d @getProcessName\n", getProcessName_error);
       } else {
          fwprintf(o_txt, L"%ls\n", processName);
       }
@@ -76,7 +75,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
    HWND *hWindows;
    size_t hWindows_count;
-   errno_t getWindowHandles_error = getWindowHandles(&hWindows, &hWindows_count);
+   errno_t getWindowHandles_error =
+       getWindowHandles(&hWindows, &hWindows_count);
 
    fclose(o_txt);
 
@@ -123,13 +123,11 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
          LPCREATESTRUCT lpcs;
          wchar_t message_CREATE[512];
          lpcs = (LPCREATESTRUCT)lParam;
-         swprintf_s(message_CREATE, sizeof(message_CREATE) / 2,
+         /*swprintf_s(message_CREATE, sizeof(message_CREATE) / 2,
                     L"lpszClass: %ls\nlpszName: %ls\n"
                     L"x: %d\ny: %d\ncx: %d\ncy: %d\n",
                     lpcs->lpszClass, lpcs->lpszName, lpcs->x, lpcs->y, lpcs->cx,
-                    lpcs->cy);
-         MessageBox(hWindow, message_CREATE, L"WM_CREATE",
-                    MB_OK | MB_ICONINFORMATION);
+                    lpcs->cy);*/
          return 0;
 
       case WM_MOVE:

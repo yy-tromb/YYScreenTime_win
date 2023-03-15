@@ -1,6 +1,6 @@
 #include "./include/winutils.h"
 
-#define HEAP_COUNT 1024
+#define GET_WINDOWS_HEAP_COUNT 1024
 
 errno_t getProcesses(DWORD **all_processes, unsigned int *all_processes_count) {
    DWORD allProcesses_size;
@@ -35,9 +35,10 @@ errno_t getProcessName(DWORD processID, wchar_t **processName) {
                                  FALSE, processID);
    if (hProcess != NULL) {
       DWORD fileName_size;
-      wchar_t *fileName=NULL;
+      wchar_t *fileName = NULL;
       for (fileName_size = 256; fileName_size <= 65536; fileName_size <<= 1) {
-         fileName=(wchar_t*)realloc(fileName,sizeof(wchar_t)*fileName_size);
+         fileName =
+             (wchar_t *)realloc(fileName, sizeof(wchar_t) * fileName_size);
          DWORD result_name_size = fileName_size;
          if (QueryFullProcessImageNameW(hProcess, 0, fileName,
                                         &result_name_size) == 0) {
@@ -55,7 +56,7 @@ errno_t getProcessName(DWORD processID, wchar_t **processName) {
       CloseHandle(hProcess);
       return EXIT_SUCCESS;
    } else {
-      *processName=NULL;
+      *processName = NULL;
       return (errno_t)GetLastError();
    }
 }
@@ -73,13 +74,12 @@ struct EnumWindowProcData {
 errno_t getWindowHandles(HWND **hWindows, size_t *hWindows_countP) {
    struct EnumWindowProcData enumWindowProcData;
    enumWindowProcData.hWindows =
-       (HWND *)calloc(sizeof(HWND) * HEAP_COUNT, sizeof(HWND));
+       (HWND *)calloc(sizeof(HWND) * GET_WINDOWS_HEAP_COUNT, sizeof(HWND));
    if (enumWindowProcData.hWindows == NULL) {
-      return ERROR_INSUFFICIENT_BUFFER;
+      return (errno_t)ERROR_INSUFFICIENT_BUFFER;
    } else {
       enumWindowProcData.hWindows_count = 0;
-      enumWindowProcData.heap_count = HEAP_COUNT;
-      enumWindowProcData.hWindows_count = 0;
+      enumWindowProcData.heap_count = GET_WINDOWS_HEAP_COUNT;
       enumWindowProcData.error = 0;
       WINBOOL enunWindowError =
           EnumWindows(EnumWindowsProc, (LPARAM)&enumWindowProcData);

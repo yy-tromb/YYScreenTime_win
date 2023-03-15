@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -mwindows -municode -Wl,-subsystem,windows -static -Wall -fexec-charset=CP932
+CFLAGS = -mwindows -municode -Wl,-subsystem,windows -static -static-libgcc -static-libstdc++ -Wall -fexec-charset=CP932
 RESCC = windres
 RESCFLAGS = -O coff
 
