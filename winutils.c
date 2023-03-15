@@ -104,6 +104,8 @@ BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
        (struct EnumWindowProcData *)lParam;
    int heap_count = enumWindowProcDataP->heap_count;
    hWindows = enumWindowProcDataP->hWindows;
+
+   //memory check
    if (count > heap_count) {
       heap_count += 1024;
       enumWindowProcDataP->heap_count = heap_count;
@@ -115,7 +117,15 @@ BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
          enumWindowProcDataP->hWindows = hWindows;
       }
    }
+   //memory check end
+
+   //window check
    if (hWindow != NULL) {
+      const DWORD dwStyle = (DWORD)GetWindowLongW(hWindow, GWL_STYLE);
+      const DWORD dwExStyle = (DWORD)GetWindowLongW(hWindow, GWL_EXSTYLE);
+      wchar_t windowClassName[MAX_WINDOW_CLASS_NAME_LENGTH];
+
+      //condition
       hWindows[count++] = hWindow;
       enumWindowProcDataP->hWindows_count = count;
       return TRUE;

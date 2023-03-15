@@ -12,6 +12,8 @@
 #define __STDC_UTF_32__ 1;
 #endif
 
+#define MAX_WINDOW_CLASS_NAME_LENGTH 256  // NULL 文字終端込み
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>

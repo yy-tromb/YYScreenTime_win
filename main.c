@@ -34,7 +34,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    MSG message;
    FILE *processes_out;
    FILE *windows_out;
-   FILE *log;
+   const FILE *log;
    errno_t file_error =
        fopen_s(&processes_out, "./processes.txt", "w,ccs=UTF-8");
    if (file_error != 0) {
