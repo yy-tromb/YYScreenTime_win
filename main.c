@@ -34,7 +34,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    MSG message;
    FILE *processes_out;
    FILE *windows_out;
-   const FILE *log;
+   FILE *logFile;
    errno_t file_error =
        fopen_s(&processes_out, "./processes.txt", "w,ccs=UTF-8");
    if (file_error != 0) {
@@ -50,12 +50,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       MessageBoxA(NULL, hoge, "", MB_OK);
       return 1;
    }
-   errno_t log_error = fopen_s(&log, "./log.txt", "w,ccs=UTF-8");
+   errno_t log_error = fopen_s(&logFile, "./log.txt", "w,ccs=UTF-8");
    if (log_error != 0) {
       return 1;
    } else {
-      fputws(L"Start log...\n", log);
-      fflush(log);
+      fputws(L"Start log...\n", logFile);
+      fflush(logFile);
    }
 
    DWORD *all_processes;
@@ -63,8 +63,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    errno_t getProcesses_error =
        getProcesses(&all_processes, &all_processes_count);
    if (getProcesses_error != 0) {
-      fwprintf_s(log, L"error:%d @getProcesses line:%d\n", getProcesses_error,
-                 __LINE__);
+      fwprintf_s(logFile, L"error:%d @getProcesses line:%d\n",
+                 getProcesses_error, __LINE__);
    } else {
       int i;
       for (i = 0; i < all_processes_count; i++) {
@@ -72,7 +72,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
          errno_t getProcessName_error =
              getProcessName(all_processes[i], &processName);
          if (getProcessName_error != 0) {
-            fwprintf_s(log, L"error:%d @getProcessName line:%d\n",
+            fwprintf_s(logFile, L"error:%d @getProcessName line:%d\n",
                        getProcessName_error, __LINE__);
          } else {
             fwprintf_s(processes_out, L"%ls\n", processName);
@@ -86,7 +86,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    errno_t getWindowHandles_error =
        getWindowHandles(&hWindows, &hWindows_count);
    if (getWindowHandles_error != 0) {
-      fwprintf_s(log, L"error:%d @getWindowHandles line:%d\n",
+      fwprintf_s(logFile, L"error:%d @getWindowHandles line:%d\n",
                  getWindowHandles_error, __LINE__);
    } else {
       int i;
@@ -94,14 +94,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
          DWORD processID;
          errno_t getHWindowPID_error = getHWindowPID(hWindows[i], &processID);
          if (getHWindowPID_error != 0) {
-            fwprintf_s(log, L"error:%d @getHWindowPID line:%d\n",
+            fwprintf_s(logFile, L"error:%d @getHWindowPID line:%d\n",
                        getHWindowPID_error, __LINE__);
          } else {
             wchar_t *processName;
             errno_t getProcessName_error =
                 getProcessName(processID, &processName);
             if (getProcessName_error != 0) {
-               fwprintf_s(log, L"error:%d @getProcessName line:%d\n",
+               fwprintf_s(logFile, L"error:%d @getProcessName line:%d\n",
                           getProcessName_error, __LINE__);
             } else {
                fwprintf_s(windows_out, L"%ls\n", processName);

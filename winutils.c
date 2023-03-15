@@ -100,12 +100,13 @@ errno_t getWindowHandles(HWND **hWindows, size_t *hWindows_countP) {
 BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
    static int count = 0;
    static HWND *hWindows;
+   static FILE *logFile;
    struct EnumWindowProcData *enumWindowProcDataP =
        (struct EnumWindowProcData *)lParam;
    int heap_count = enumWindowProcDataP->heap_count;
    hWindows = enumWindowProcDataP->hWindows;
 
-   //memory check
+   // memory check
    if (count > heap_count) {
       heap_count += 1024;
       enumWindowProcDataP->heap_count = heap_count;
@@ -117,15 +118,27 @@ BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
          enumWindowProcDataP->hWindows = hWindows;
       }
    }
-   //memory check end
+   // memory check end
 
-   //window check
+   // window check
    if (hWindow != NULL) {
       const DWORD dwStyle = (DWORD)GetWindowLongW(hWindow, GWL_STYLE);
       const DWORD dwExStyle = (DWORD)GetWindowLongW(hWindow, GWL_EXSTYLE);
       wchar_t windowClassName[MAX_WINDOW_CLASS_NAME_LENGTH];
 
-      //condition
+      errno_t GetClassName_error =
+          GetClassNameW(hWindow, windowClassName, MAX_WINDOW_CLASS_NAME_LENGTH);
+      if (GetClassName_error == 0) {
+         // debug
+         fopen_s(&logFile, "./log_enumWindowsProc.txt", "w,ccs=UTF-8");
+         fwprintf_s(logFile, L"error:%d @GetClassName file:%s line:%d",
+                    GetClassName_error, __FILE__, __LINE__);
+         fclose(logFile);
+         return TRUE;  // continue
+      } else {
+         // TODO
+      }
+      // condition
       hWindows[count++] = hWindow;
       enumWindowProcDataP->hWindows_count = count;
       return TRUE;
