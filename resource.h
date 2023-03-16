@@ -1,19 +1,21 @@
-//{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ で生成されたインクルード ファイル。
-// res.rc で使用
-//
-#define IDR_MENU1                       101
-#define IDS_MENU_FILE                   102
-#define IDS__MENU_USERBILITY            103
-#define IDS_MENU_HELP                   104
+#define ID_MENU                       101
+#define IDM_SETTING                   102
+#define IDM_EXIT                      103
+#define IDM_ABOUT                     104
+#define IDM_FOCUSMODE                 105
+#define IDM_APPTIMER                  106
+#define IDM_RESIDENT                  107
+#define IDM_STARTUP                   108
 
-// Next default values for new objects
-// 
-#ifdef APSTUDIO_INVOKED
-#ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        103
-#define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1000
-#define _APS_NEXT_SYMED_VALUE           101
+#define IDM_FILE                      110
+#define IDM_USERBILITY                111
+#define IDM_HELP                      112
+
+#define IDR_MAINFRAME                 150
+#define IDD_ABOUT                     160
+
+#ifndef IDC_STATIC
+#define IDC_STATIC -1
 #endif
-#endif
+
+#define APPICON                       200

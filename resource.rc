@@ -1,79 +1,80 @@
-// Microsoft Visual C++ generated resource script.
-//
+#include <windows.h>
 #include "resource.h"
 /////////////////////////////////////////////////////////////////////////////
 // 日本語 (日本) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
-#pragma code_page(932)
+//#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+//LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Icon
 //
 
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
 APPICON                 ICON                    "./resources/appicon.ico"
-
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-
+ID_MENU MENU
+BEGIN
+    POPUP "ファイル(&F)"
+    BEGIN
+        MENUITEM "設定(&S)", IDM_SETTING
+        MENUITEM "終了(&E)", IDM_EXIT
+    END
+    POPUP "機能(&U)"
+    BEGIN
+        MENUITEM "フォーカスモード(&F)", IDM_FOCUSMODE
+        MENUITEM "アプリタイマー(&T)", IDM_APPTIMER
+        MENUITEM SEPARATOR
+        MENUITEM "常駐(&R)", IDM_RESIDENT
+        MENUITEM "スタートアップ(&S)", IDM_STARTUP
+    END
+    POPUP "ヘルプ(&H)"
+    BEGIN
+        MENUITEM "このアプリについて(&A)...", IDM_ABOUT
+    END
+END
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
 //
 
-STRINGTABLE
+//STRINGTABLE
+//BEGIN
+//    IDM_FILE           "ファイル(&F)"
+//    IDM_USERBILITY    "機能(&U)"
+//    IDM_HELP           "ヘルプ(&H)"
+//END
+
+//#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////
+
+//#else
+
+//#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+//LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+//STRINGTABLE
+//BEGIN
+//    IDM_FILE        "File(&F)"
+//    IDM_USERBILITY  "Uservility(&U)"
+//    IDM_HELP        "Help(&H)"
+
+//#endif
+
+IDD_ABOUT DIALOGEX 0, 0, 170, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "このアプリについて"
+FONT 18, "MS UI Gothic"
 BEGIN
-    IDS_MENU_FILE           "ファイル(F)"
-    IDS__MENU_USERBILITY    "機能(U)"
-    IDS_MENU_HELP           "ヘルプ(H)"
+    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
+    LTEXT           "YYScreenTime_win ver.α0.2",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) yy-tromb 2023",IDC_STATIC,42,26,114,8
+    DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
 END
-
-#endif    // 日本語 (日本) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-
-#ifndef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 3 resource.
-//
-
-
-/////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED
-

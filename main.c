@@ -22,12 +22,17 @@
 #include "./include/winAPI_highDPI.h"
 #include "./include/winutils.h"
 #include "./include/strutil.h"
+#include "./resource.h"
 
 LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK dialog_about(HWND hDialog,UINT uMsg,WPARAM wParam,LPARAM lParam);
+
+HINSTANCE hInstance_g;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     PWSTR lpCmdLine, int nCmdShow) {
    winAPI_highDPI();
+   hInstance_g=hInstance;
    const wchar_t appName[] = L"mytest";
    WNDCLASS wndClass;
    HWND hWindow;
@@ -119,10 +124,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    wndClass.cbClsExtra = 0;
    wndClass.cbWndExtra = 0;
    wndClass.hInstance = hInstance;
-   wndClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+   wndClass.hIcon = LoadIcon(NULL, APPICON);
    wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
    wndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-   wndClass.lpszMenuName = NULL;
+   wndClass.lpszMenuName = MAKEINTRESOURCEW(ID_MENU);
    wndClass.lpszClassName = appName;
 
    if (!RegisterClass(&wndClass)) {
@@ -133,14 +138,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                            CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
                            CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
 
-   if (!hWindow) {
+   if (hWindow == 0) {
       return 0;
    }
 
    ShowWindow(hWindow, nCmdShow);
    UpdateWindow(hWindow);
 
-   while (GetMessage(&message, NULL, 0, 0) > 0) {
+   HICON hAppIcon = LoadImageW(hInstance, MAKEINTRESOURCEW(APPICON), IMAGE_ICON,
+                               0, 0, LR_DEFAULTCOLOR);
+   SendMessageW(hWindow, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)hAppIcon);
+
+       while (GetMessage(&message, NULL, 0, 0) > 0) {
       TranslateMessage(&message);
       DispatchMessage(&message);
    }
@@ -152,6 +161,12 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
                          LPARAM lParam) {
    static int MOVE_x, MOVE_y;
    static int SIZE_x, SIZE_y;
+   static int wm_id,wm_event;
+   static HMENU hMenu;
+   static unsigned int resident_flag,startup_flag;
+
+   hMenu=GetMenu(hWindow);
+
    switch (uMsg) {
       case WM_CREATE:
          LPCREATESTRUCT lpcs;
@@ -163,6 +178,35 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
                     lpcs->lpszClass, lpcs->lpszName, lpcs->x, lpcs->y, lpcs->cx,
                     lpcs->cy);*/
          return 0;
+         break;
+
+      case WM_COMMAND:
+         wm_id=LOWORD(wParam);
+         wm_event=HIWORD(wParam);
+         switch(wm_id){
+            case IDM_RESIDENT:
+            case IDM_STARTUP:
+            MENUITEMINFO menuItemInfo = {sizeof(MENUITEMINFO),MIIM_STATE};
+            GetMenuItemInfo(hMenu,wm_id,FALSE,&menuItemInfo);
+            menuItemInfo.fState = (menuItemInfo.fState == MFS_CHECKED)
+                                      ? MFS_UNCHECKED
+                                      : MFS_CHECKED;
+            SetMenuItemInfo(hMenu, wm_id, FALSE, &menuItemInfo);
+            InvalidateRect(hWindow,NULL,FALSE);
+            break;
+
+            case IDM_ABOUT:
+               DialogBoxW(hInstance_g,MAKEINTRESOURCEW(IDD_ABOUT),hWindow,dialog_about);
+               break;
+
+            case IDM_EXIT:
+               DestroyWindow(hWindow);
+               break;
+
+            default:
+               return DefWindowProc(hWindow,uMsg,wParam,lParam);
+         }
+         break;
 
       case WM_MOVE:
          wchar_t message_MOVE[128];
@@ -197,4 +241,19 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
    }
 
    return DefWindowProc(hWindow, uMsg, wParam, lParam);
+}
+
+LRESULT CALLBACK dialog_about(HWND hDialog,UINT uMsg,WPARAM wParam,LPARAM lParam){
+   UNREFERENCED_PARAMETER(lParam);
+   switch(uMsg){
+   case WM_INITDIALOG:
+         return (INT_PTR)TRUE;
+
+   case WM_COMMAND:
+         if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL){
+            EndDialog(hDialog, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+         } 
+         }
+   return (INT_PTR)FALSE;
 }
