@@ -58,9 +58,10 @@ dkms.conf
 
 foo*.*
 
-.vscode/
-o.txt
+/.vscode/
 !/lib/*.a
 
 /YYScreenTime_win*/
 /*.txt
+/image.png
+/ref/

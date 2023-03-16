@@ -7,7 +7,7 @@ INC = -I .\include
 LIB = -L .\lib
 
 SRCS = main.c winutils.c strutil.c
-RESRCS = icon.rc
+RESRCS = res.rc
 OBJS = $(SRCS:%.c=%.o)
 REOBJS = $(RESRCS:%.rc=%.res)
 

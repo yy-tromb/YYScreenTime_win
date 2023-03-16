@@ -62,16 +62,20 @@ errno_t getProcessName(DWORD processID, wchar_t **processName) {
 }
 
 // 共有はしない
-BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
+BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam);
+bool isWindowAppearingInTaskbar(HWND hWindow, DWORD windowStyle,
+                                DWORD windowExStyle);
 
 struct EnumWindowProcData {
    HWND *hWindows;
    size_t hWindows_count;
    size_t heap_count;
    errno_t error;
+   bool filter;
 };
 
-errno_t getWindowHandles(HWND **hWindows, size_t *hWindows_countP) {
+errno_t getWindowHandles(HWND **hWindows, size_t *hWindows_countP,
+                         bool filter) {
    struct EnumWindowProcData enumWindowProcData;
    enumWindowProcData.hWindows =
        (HWND *)calloc(sizeof(HWND) * GET_WINDOWS_HEAP_COUNT, sizeof(HWND));
@@ -81,6 +85,7 @@ errno_t getWindowHandles(HWND **hWindows, size_t *hWindows_countP) {
       enumWindowProcData.hWindows_count = 0;
       enumWindowProcData.heap_count = GET_WINDOWS_HEAP_COUNT;
       enumWindowProcData.error = 0;
+      enumWindowProcData.filter=filter;
       WINBOOL enunWindowError =
           EnumWindows(EnumWindowsProc, (LPARAM)&enumWindowProcData);
       *hWindows = enumWindowProcData.hWindows;
@@ -100,7 +105,6 @@ errno_t getWindowHandles(HWND **hWindows, size_t *hWindows_countP) {
 BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
    static int count = 0;
    static HWND *hWindows;
-   static FILE *logFile;
    struct EnumWindowProcData *enumWindowProcDataP =
        (struct EnumWindowProcData *)lParam;
    int heap_count = enumWindowProcDataP->heap_count;
@@ -122,26 +126,24 @@ BOOL CALLBACK EnumWindowsProc(HWND hWindow, LPARAM lParam) {
 
    // window check
    if (hWindow != NULL) {
-      const DWORD dwStyle = (DWORD)GetWindowLongW(hWindow, GWL_STYLE);
-      const DWORD dwExStyle = (DWORD)GetWindowLongW(hWindow, GWL_EXSTYLE);
-      wchar_t windowClassName[MAX_WINDOW_CLASS_NAME_LENGTH];
-
-      errno_t GetClassName_error =
-          GetClassNameW(hWindow, windowClassName, MAX_WINDOW_CLASS_NAME_LENGTH);
-      if (GetClassName_error == 0) {
-         // debug
-         fopen_s(&logFile, "./log_enumWindowsProc.txt", "w,ccs=UTF-8");
-         fwprintf_s(logFile, L"error:%d @GetClassName file:%s line:%d",
-                    GetClassName_error, __FILE__, __LINE__);
-         fclose(logFile);
-         return TRUE;  // continue
-      } else {
-         // TODO
+      if (enumWindowProcDataP->filter == true) {
+         const DWORD windowStyle = (DWORD)GetWindowLongW(hWindow, GWL_STYLE);
+         const DWORD windowExStyle =
+             (DWORD)GetWindowLongW(hWindow, GWL_EXSTYLE);
+         // condition
+         if (isWindowAppearingInTaskbar(hWindow, windowStyle, windowExStyle) ==
+             true) {
+            hWindows[count++] = hWindow;
+            enumWindowProcDataP->hWindows_count = count;
+            return TRUE;
+         } else {
+            return TRUE;  // not in Taskbar. continue
+         }
+      }else{
+         hWindows[count++] = hWindow;
+         enumWindowProcDataP->hWindows_count = count;
+         return TRUE;
       }
-      // condition
-      hWindows[count++] = hWindow;
-      enumWindowProcDataP->hWindows_count = count;
-      return TRUE;
    } else {
       return TRUE;  // continue
    }
@@ -152,5 +154,21 @@ errno_t getHWindowPID(HWND hWindow, DWORD *processID) {
       return (errno_t)GetLastError();
    } else {
       return EXIT_SUCCESS;
+   }
+}
+
+bool isWindowAppearingInTaskbar(HWND hWindow, DWORD windowStyle,
+                                DWORD windowExStyle) {
+   if ((windowStyle & WS_VISIBLE) == 0) return false;
+   if ((windowExStyle & WS_EX_TOOLWINDOW) != 0) return false;
+#if (WINVER >= 0x0602)
+   if ((windowExStyle & WS_EX_NOREDIRECTIONBITMAP) != 0) return false;
+#endif
+   HWND hOwnerWindow = GetWindow(hWindow, GW_OWNER);
+   if (hOwnerWindow != NULL && (((windowExStyle & WS_EX_APPWINDOW) == 0) ||
+                                (IsIconic(hOwnerWindow) == TRUE))) {
+      return false;
+   } else {
+      return true;
    }
 }

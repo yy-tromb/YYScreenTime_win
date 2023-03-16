@@ -84,7 +84,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    HWND *hWindows;
    size_t hWindows_count;
    errno_t getWindowHandles_error =
-       getWindowHandles(&hWindows, &hWindows_count);
+       getWindowHandles(&hWindows, &hWindows_count,false);
    if (getWindowHandles_error != 0) {
       fwprintf_s(logFile, L"error:%d @getWindowHandles line:%d\n",
                  getWindowHandles_error, __LINE__);
@@ -110,6 +110,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       }
    }
    fclose(windows_out);
+
+   //wchar_t windowClassName[MAX_WINDOW_CLASS_NAME_LENGTH];
+   //errno_t GetClassName_error = GetClassNameW(hWindow, windowClassName, MAX_WINDOW_CLASS_NAME_LENGTH);
 
    wndClass.style = CS_HREDRAW | CS_VREDRAW;
    wndClass.lpfnWndProc = WndProc;
