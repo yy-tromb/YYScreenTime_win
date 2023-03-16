@@ -14,6 +14,8 @@
 #define IDR_MAINFRAME                 150
 #define IDD_ABOUT                     160
 
+#define ID_TAB                        170
+
 #ifndef IDC_STATIC
 #define IDC_STATIC                    -1
 #endif

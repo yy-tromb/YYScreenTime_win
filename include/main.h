@@ -23,10 +23,12 @@
 #include "./winAPI_highDPI.h"
 #include "./winutils.h"
 #include "./strutil.h"
+#include "./guiutils.h"
 #include "./resource.h"
 
 #define perY(percent) ((int)SIZE_y * (percent / 100))
 #define perX(percent) ((int)SIZE_x * (percent / 100))
+
 
 LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK dialog_about(HWND hDialog, UINT uMsg, WPARAM wParam,

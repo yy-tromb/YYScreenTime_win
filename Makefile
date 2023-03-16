@@ -6,12 +6,12 @@ RESCFLAGS = -O coff
 INC = -I .\include
 LIB = -L .\lib
 
-SRCS = main.c winutils.c strutil.c
+SRCS = main.c winutils.c strutil.c guiutils.c
 RESRCS = resource.rc
 OBJS = $(SRCS:%.c=%.o)
 REOBJS = $(RESRCS:%.rc=%.res)
 
-LDFLAGS = -lwinapi_highDPI
+LDFLAGS = -lwinapi_highDPI -lcomctl32
 
 NAME = YYScreenTime_win
 EXT ?= exe

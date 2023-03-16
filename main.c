@@ -1,6 +1,7 @@
 #include "./include/main.h"
 
 HINSTANCE hInstance_g;
+FILE *logFile_g;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     PWSTR lpCmdLine, int nCmdShow) {
@@ -34,6 +35,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    } else {
       fputws(L"Start log...\n", logFile);
       fflush(logFile);
+      logFile_g=logFile;
    }
 
    DWORD *all_processes;
@@ -113,6 +115,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                            CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
 
    if (hWindow == 0) {
+      fwprintf_s(logFile,L"error");
       return 0;
    }
 
@@ -138,6 +141,15 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
    static int wm_id, wm_event;
    static HMENU hMenu;
    static unsigned int resident_flag, startup_flag;
+   static int selectedTab;
+   static RECT clientRect;
+   static HWND hTab;
+
+   HDC hDC;
+   static PAINTSTRUCT paintStruct;
+   static HPEN hPen, hPen_prev;
+   static HBRUSH hBrush, hBrush_prev;
+   static HFONT hFont,hFont_prev;
 
    hMenu = GetMenu(hWindow);
 
@@ -146,6 +158,18 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
          LPCREATESTRUCT lpcs;
          wchar_t message_CREATE[512];
          lpcs = (LPCREATESTRUCT)lParam;
+         errno_t settingTabControl_error =
+             settingTabControl(&hWindow, &clientRect, &hTab, &hInstance_g);
+         if (settingTabControl_error != 0) {
+            if (MessageBoxW(hWindow, L"エラーが発生しました。終了しますか？",
+                            L"警告", MB_YESNO | MB_ICONWARNING) == IDYES &&
+                MessageBoxW(hWindow, L"本当に終了しますか？", L"終了の確認",
+                            MB_YESNO | MB_ICONWARNING) == IDYES) {
+               DestroyWindow(hWindow);
+            } else {
+               return 0;
+            }
+         }
          /*swprintf_s(message_CREATE, sizeof(message_CREATE) / 2,
                     L"lpszClass: %ls\nlpszName: %ls\n"
                     L"x: %d\ny: %d\ncx: %d\ncy: %d\n",
@@ -160,12 +184,12 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
          switch (wm_id) {
             case IDM_RESIDENT:
             case IDM_STARTUP:
-               MENUITEMINFO menuItemInfo = {sizeof(MENUITEMINFO), MIIM_STATE};
-               GetMenuItemInfo(hMenu, wm_id, FALSE, &menuItemInfo);
+               MENUITEMINFOW menuItemInfo = {sizeof(MENUITEMINFOW), MIIM_STATE};
+               GetMenuItemInfoW(hMenu, wm_id, FALSE, &menuItemInfo);
                menuItemInfo.fState = (menuItemInfo.fState == MFS_CHECKED)
                                          ? MFS_UNCHECKED
                                          : MFS_CHECKED;
-               SetMenuItemInfo(hMenu, wm_id, FALSE, &menuItemInfo);
+               SetMenuItemInfoW(hMenu, wm_id, FALSE, &menuItemInfo);
                InvalidateRect(hWindow, NULL, FALSE);
                break;
 
@@ -175,13 +199,12 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
                break;
 
             case IDM_EXIT:
-               int messageboxID =
-                   MessageBox(hWindow, L"本当に終了しますか？", L"終了の確認",
-                              MB_YESNO | MB_ICONWARNING);
-               if (messageboxID == IDYES) {
+               if (MessageBoxW(hWindow, L"本当に終了しますか？", L"終了の確認",
+                               MB_YESNO | MB_ICONWARNING) == IDYES) {
                   DestroyWindow(hWindow);
+               } else {
+                  return 0;
                }
-               return 0;
                break;
 
             default:
@@ -192,12 +215,12 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
       case WM_GETMINMAXINFO:
          MINMAXINFO *minMaxInfo;
          minMaxInfo = (MINMAXINFO *)lParam;
-         minMaxInfo->ptMinTrackSize.x = 960; // 最小幅
-         minMaxInfo->ptMinTrackSize.y = 640; // 最小高
+         minMaxInfo->ptMinTrackSize.x = 960;  // 最小幅
+         minMaxInfo->ptMinTrackSize.y = 640;  // 最小高
          return 0;
          break;
 
-          case WM_MOVE:
+      case WM_MOVE:
          wchar_t message_MOVE[128];
          MOVE_y = HIWORD(lParam);  // y 座標を取り出す
          MOVE_x = LOWORD(lParam);  // x 座標を取り出す
@@ -211,20 +234,50 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
          wchar_t message_SIZE[128];
          SIZE_y = HIWORD(lParam);  // y 座標を取り出す
          SIZE_x = LOWORD(lParam);  // x 座標を取り出す
+         errno_t GetClientRect_error = GetClientRect(hWindow, &clientRect);
+         if (GetClientRect_error == 0) {
+            if (MessageBoxW(
+                    hWindow,
+                    L"ウィンドウのサイズが取得できませんでした。終了しますか？",
+                    L"警告", MB_YESNO | MB_ICONWARNING) == IDYES &&
+                MessageBoxW(hWindow, L"本当に終了しますか？", L"終了の確認",
+                            MB_YESNO | MB_ICONWARNING) == IDYES) {
+               DestroyWindow(hWindow);
+            } else {
+               return 0;
+            }
+         } else {
+            TabCtrl_AdjustRect(hTab, FALSE, &clientRect);
+            MoveWindow(hTab, 0, 0, LOWORD(lParam), HIWORD(lParam), TRUE);
+         }
          swprintf_s(message_SIZE, sizeof(message_SIZE) / 2, L"WM_SIZE (%d, %d)",
                     SIZE_x, SIZE_y);
          SetWindowText(hWindow, message_SIZE);
          return 0;
          break;
 
-      case WM_CLOSE:
-         int messageboxID =
-             MessageBox(hWindow, L"本当に終了しますか？", L"終了の確認",
-                        MB_YESNO | MB_ICONWARNING);
-         if (messageboxID == IDYES) {
-            DestroyWindow(hWindow);
+      case WM_NOTIFY:
+         switch (((NMHDR *)lParam)->code) {
+            case TCN_SELCHANGE:
+               InvalidateRect(hTab, NULL, TRUE);
+               selectedTab = TabCtrl_GetCurSel(hTab);
+               return 0;
+               break;
+
+            case TCN_SELCHANGING:
+               selectedTab = TabCtrl_GetCurSel(hTab);
+               return 0;
+               break;
          }
-         return 0;
+         break;
+
+      case WM_CLOSE:
+         if (MessageBoxW(hWindow, L"本当に終了しますか？", L"終了の確認",
+                         MB_YESNO | MB_ICONWARNING) == IDYES) {
+            DestroyWindow(hWindow);
+         } else {
+            return 0;
+         }
          break;
 
       case WM_DESTROY:
