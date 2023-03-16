@@ -11,13 +11,6 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Icon
-//
-
-APPICON                 ICON                    "./resources/appicon.ico"
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Menu
 //
 
@@ -55,13 +48,35 @@ BEGIN
     IDM_HELP           "ヘルプ(&H)"
 END
 
-//#endif    // 日本語 (日本) resources
+#endif    // 日本語 (日本) resources
 /////////////////////////////////////////////////////////////////////////////
 
-#else
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
-//#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-//LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+ID_MENU MENU
+BEGIN
+    POPUP "File(&F)"
+    BEGIN
+        MENUITEM "Settings(&S)...", IDM_SETTING
+        MENUITEM SEPARATOR
+        MENUITEM "Exit(&E)", IDM_EXIT
+    END
+    POPUP "Usability(&U)"
+    BEGIN
+        MENUITEM "Focus Mode(&F)", IDM_FOCUSMODE
+        MENUITEM "App Timer(&T)", IDM_APPTIMER
+        MENUITEM SEPARATOR
+        MENUITEM "Resident(&R)", IDM_RESIDENT
+        MENUITEM "Start up(&S)", IDM_STARTUP
+    END
+    POPUP "Help(&H)"
+    BEGIN
+        MENUITEM "About this App(&A)...", IDM_ABOUT
+    END
+END
+
 
 STRINGTABLE
 BEGIN
@@ -72,13 +87,21 @@ END
 
 #endif
 
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+APPICON                 ICON                    "./resources/appicon.ico"
+
+
 IDD_ABOUT DIALOGEX 0, 0, 170, 62
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "このアプリについて"
 FONT 18, "MS UI Gothic"
 BEGIN
-    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
-    LTEXT           "YYScreenTime_win ver.α0.2",IDC_STATIC,42,14,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) yy-tromb 2023",IDC_STATIC,42,26,114,8
+    ICON            APPICON,IDC_STATIC,20,16,20,20
+    LTEXT           "YYScreenTime_win ver.α0.2",IDC_STATIC,50,14,114,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) yy-tromb 2023",IDC_STATIC,50,26,114,8
     DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
 END

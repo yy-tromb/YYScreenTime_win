@@ -1,38 +1,11 @@
-#define UNICODE 1
-#define _UNICODE 1
-#ifndef __STDC_ISO_10646__
-#define __STDC_ISO_10646__ 201706;
-#endif
-#ifndef __STDC_UTF_16__
-#define __STDC_UTF_16__ 1;
-#endif
-#ifndef __STDC_UTF_32__
-#define __STDC_UTF_32__ 1;
-#endif
-
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <wchar.h>
-#include <windows.h>
-#include <Psapi.h>
-#include <locale.h>
-
-#include "./include/winAPI_highDPI.h"
-#include "./include/winutils.h"
-#include "./include/strutil.h"
-#include "./resource.h"
-
-LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK dialog_about(HWND hDialog,UINT uMsg,WPARAM wParam,LPARAM lParam);
+#include "./include/main.h"
 
 HINSTANCE hInstance_g;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     PWSTR lpCmdLine, int nCmdShow) {
    winAPI_highDPI();
-   hInstance_g=hInstance;
+   hInstance_g = hInstance;
    const wchar_t appName[] = L"mytest";
    WNDCLASS wndClass;
    HWND hWindow;
@@ -89,7 +62,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    HWND *hWindows;
    size_t hWindows_count;
    errno_t getWindowHandles_error =
-       getWindowHandles(&hWindows, &hWindows_count,false);
+       getWindowHandles(&hWindows, &hWindows_count, false);
    if (getWindowHandles_error != 0) {
       fwprintf_s(logFile, L"error:%d @getWindowHandles line:%d\n",
                  getWindowHandles_error, __LINE__);
@@ -116,8 +89,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    }
    fclose(windows_out);
 
-   //wchar_t windowClassName[MAX_WINDOW_CLASS_NAME_LENGTH];
-   //errno_t GetClassName_error = GetClassNameW(hWindow, windowClassName, MAX_WINDOW_CLASS_NAME_LENGTH);
+   // wchar_t windowClassName[MAX_WINDOW_CLASS_NAME_LENGTH];
+   // errno_t GetClassName_error = GetClassNameW(hWindow, windowClassName,
+   // MAX_WINDOW_CLASS_NAME_LENGTH);
 
    wndClass.style = CS_HREDRAW | CS_VREDRAW;
    wndClass.lpfnWndProc = WndProc;
@@ -149,7 +123,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                                0, 0, LR_DEFAULTCOLOR);
    SendMessageW(hWindow, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)hAppIcon);
 
-       while (GetMessage(&message, NULL, 0, 0) > 0) {
+   while (GetMessage(&message, NULL, 0, 0) > 0) {
       TranslateMessage(&message);
       DispatchMessage(&message);
    }
@@ -161,11 +135,11 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
                          LPARAM lParam) {
    static int MOVE_x, MOVE_y;
    static int SIZE_x, SIZE_y;
-   static int wm_id,wm_event;
+   static int wm_id, wm_event;
    static HMENU hMenu;
-   static unsigned int resident_flag,startup_flag;
+   static unsigned int resident_flag, startup_flag;
 
-   hMenu=GetMenu(hWindow);
+   hMenu = GetMenu(hWindow);
 
    switch (uMsg) {
       case WM_CREATE:
@@ -181,34 +155,49 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
          break;
 
       case WM_COMMAND:
-         wm_id=LOWORD(wParam);
-         wm_event=HIWORD(wParam);
-         switch(wm_id){
+         wm_id = LOWORD(wParam);
+         wm_event = HIWORD(wParam);
+         switch (wm_id) {
             case IDM_RESIDENT:
             case IDM_STARTUP:
-            MENUITEMINFO menuItemInfo = {sizeof(MENUITEMINFO),MIIM_STATE};
-            GetMenuItemInfo(hMenu,wm_id,FALSE,&menuItemInfo);
-            menuItemInfo.fState = (menuItemInfo.fState == MFS_CHECKED)
-                                      ? MFS_UNCHECKED
-                                      : MFS_CHECKED;
-            SetMenuItemInfo(hMenu, wm_id, FALSE, &menuItemInfo);
-            InvalidateRect(hWindow,NULL,FALSE);
-            break;
+               MENUITEMINFO menuItemInfo = {sizeof(MENUITEMINFO), MIIM_STATE};
+               GetMenuItemInfo(hMenu, wm_id, FALSE, &menuItemInfo);
+               menuItemInfo.fState = (menuItemInfo.fState == MFS_CHECKED)
+                                         ? MFS_UNCHECKED
+                                         : MFS_CHECKED;
+               SetMenuItemInfo(hMenu, wm_id, FALSE, &menuItemInfo);
+               InvalidateRect(hWindow, NULL, FALSE);
+               break;
 
             case IDM_ABOUT:
-               DialogBoxW(hInstance_g,MAKEINTRESOURCEW(IDD_ABOUT),hWindow,dialog_about);
+               DialogBoxW(hInstance_g, MAKEINTRESOURCEW(IDD_ABOUT), hWindow,
+                          dialog_about);
                break;
 
             case IDM_EXIT:
-               DestroyWindow(hWindow);
+               int messageboxID =
+                   MessageBox(hWindow, L"本当に終了しますか？", L"終了の確認",
+                              MB_YESNO | MB_ICONWARNING);
+               if (messageboxID == IDYES) {
+                  DestroyWindow(hWindow);
+               }
+               return 0;
                break;
 
             default:
-               return DefWindowProc(hWindow,uMsg,wParam,lParam);
+               return DefWindowProc(hWindow, uMsg, wParam, lParam);
          }
          break;
 
-      case WM_MOVE:
+      case WM_GETMINMAXINFO:
+         MINMAXINFO *minMaxInfo;
+         minMaxInfo = (MINMAXINFO *)lParam;
+         minMaxInfo->ptMinTrackSize.x = 960; // 最小幅
+         minMaxInfo->ptMinTrackSize.y = 640; // 最小高
+         return 0;
+         break;
+
+          case WM_MOVE:
          wchar_t message_MOVE[128];
          MOVE_y = HIWORD(lParam);  // y 座標を取り出す
          MOVE_x = LOWORD(lParam);  // x 座標を取り出す
@@ -216,6 +205,7 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
                     MOVE_x, MOVE_y);
          SetWindowText(hWindow, message_MOVE);
          return 0;
+         break;
 
       case WM_SIZE:
          wchar_t message_SIZE[128];
@@ -225,6 +215,7 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
                     SIZE_x, SIZE_y);
          SetWindowText(hWindow, message_SIZE);
          return 0;
+         break;
 
       case WM_CLOSE:
          int messageboxID =
@@ -234,26 +225,29 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
             DestroyWindow(hWindow);
          }
          return 0;
+         break;
 
       case WM_DESTROY:
          PostQuitMessage(0);
          return 0;
+         break;
    }
 
    return DefWindowProc(hWindow, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK dialog_about(HWND hDialog,UINT uMsg,WPARAM wParam,LPARAM lParam){
+LRESULT CALLBACK dialog_about(HWND hDialog, UINT uMsg, WPARAM wParam,
+                              LPARAM lParam) {
    UNREFERENCED_PARAMETER(lParam);
-   switch(uMsg){
-   case WM_INITDIALOG:
+   switch (uMsg) {
+      case WM_INITDIALOG:
          return (INT_PTR)TRUE;
 
-   case WM_COMMAND:
-         if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL){
+      case WM_COMMAND:
+         if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
             EndDialog(hDialog, LOWORD(wParam));
             return (INT_PTR)TRUE;
-         } 
          }
+   }
    return (INT_PTR)FALSE;
 }

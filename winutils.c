@@ -172,3 +172,7 @@ bool isWindowAppearingInTaskbar(HWND hWindow, DWORD windowStyle,
       return true;
    }
 }
+
+errno_t searchWindow(wchar_t searchName,HWND *hWindowP){
+   //
+}
