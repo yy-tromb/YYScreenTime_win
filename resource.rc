@@ -1,11 +1,13 @@
 #include <windows.h>
 #include "resource.h"
+
+#pragma code_page(65001)
+
 /////////////////////////////////////////////////////////////////////////////
 // 日本語 (日本) resources
 
-//#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-//LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
-#pragma code_page(65001)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -23,7 +25,8 @@ ID_MENU MENU
 BEGIN
     POPUP "ファイル(&F)"
     BEGIN
-        MENUITEM "設定(&S)", IDM_SETTING
+        MENUITEM "設定(&S)...", IDM_SETTING
+        MENUITEM SEPARATOR
         MENUITEM "終了(&E)", IDM_EXIT
     END
     POPUP "機能(&U)"
@@ -45,28 +48,29 @@ END
 // String Table
 //
 
-//STRINGTABLE
-//BEGIN
-//    IDM_FILE           "ファイル(&F)"
-//    IDM_USERBILITY    "機能(&U)"
-//    IDM_HELP           "ヘルプ(&H)"
-//END
+STRINGTABLE
+BEGIN
+    IDM_FILE           "ファイル(&F)"
+    IDM_USERBILITY    "機能(&U)"
+    IDM_HELP           "ヘルプ(&H)"
+END
 
 //#endif    // 日本語 (日本) resources
 /////////////////////////////////////////////////////////////////////////////
 
-//#else
+#else
 
 //#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 //LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
-//STRINGTABLE
-//BEGIN
-//    IDM_FILE        "File(&F)"
-//    IDM_USERBILITY  "Uservility(&U)"
-//    IDM_HELP        "Help(&H)"
+STRINGTABLE
+BEGIN
+    IDM_FILE        "File(&F)"
+    IDM_USERBILITY  "Uservility(&U)"
+    IDM_HELP        "Help(&H)"
+END
 
-//#endif
+#endif
 
 IDD_ABOUT DIALOGEX 0, 0, 170, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
