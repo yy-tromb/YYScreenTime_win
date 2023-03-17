@@ -131,6 +131,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       DispatchMessage(&message);
    }
 
+   fclose(logFile_g);
    return message.wParam;
 }
 

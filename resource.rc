@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "resource.h"
+#include "./include/resource.h"
 
 #pragma code_page(65001)
 
@@ -98,9 +98,9 @@ APPICON                 ICON                    "./resources/appicon.ico"
 IDD_ABOUT DIALOGEX 0, 0, 170, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "このアプリについて"
-FONT 18, "MS UI Gothic"
+FONT 18, "ＭＳ Ｐゴシック"
 BEGIN
-    ICON            APPICON,IDC_STATIC,20,16,20,20
+    ICON            APPICON,IDC_STATIC,20,20,20,20
     LTEXT           "YYScreenTime_win ver.α0.2",IDC_STATIC,50,14,114,8,SS_NOPREFIX
     LTEXT           "Copyright (C) yy-tromb 2023",IDC_STATIC,50,26,114,8
     DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
