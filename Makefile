@@ -25,7 +25,7 @@ endif
 
 build: $(BUILD)
 
-$(BUILD): $(OBJS) $(REOBJS)
+$(BUILD): $(OBJS) $(RESOBJS)
 	$(CC) $(OBJS) $(RESOBJS) $(CFLAGS) $(EXFLAGS) $(LIB) $(LDFLAGS) -o $(BUILD)
 
 .SUFFIXES: .rc .res
