@@ -21,3 +21,7 @@
 #endif
 
 #define APPICON                       200
+
+#define ID_PAGE_TOP                      1000
+#define ID_PAGE_FOCUSMODE                1001
+#define ID_PAGE_APPTIMER                 1002

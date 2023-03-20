@@ -19,4 +19,8 @@
 #include <commctrl.h>
 #include "./resource.h"
 
-errno_t settingTabControl(HWND *hWindow,RECT *clientRect,HWND *hTab,HINSTANCE *hInstance);
+errno_t setting_tabControl(HWND *hWindow,RECT *clientRect,HWND *hTab,HINSTANCE *hInstance);
+errno_t setting_pages(HWND *hWindow, RECT *clientRect, HWND *hTab,
+                      HINSTANCE *hInstance, HWND *hPage_top, HWND *hPage_focusmode,
+                      HWND *hPage_apptimer, WNDPROC page_top_proc,
+                      WNDPROC page_focusmode_proc, WNDPROC page_apptimer_proc);

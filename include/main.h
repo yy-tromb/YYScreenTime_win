@@ -1,3 +1,5 @@
+#pragma once
+
 #define UNICODE 1
 #define _UNICODE 1
 #ifndef __STDC_ISO_10646__
@@ -31,11 +33,11 @@
 
 
 LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK dialog_about(HWND hDialog, UINT uMsg, WPARAM wParam,
+LRESULT CALLBACK dialog_about_proc(HWND hDialog, UINT uMsg, WPARAM wParam,
                               LPARAM lParam);
-LRESULT CALLBACK page_top(HWND hDialog, UINT uMsg, WPARAM wParam,
+LRESULT CALLBACK page_top_proc(HWND hDialog, UINT uMsg, WPARAM wParam,
                           LPARAM lParam);
-LRESULT CALLBACK page_focusmode(HWND hDialog, UINT uMsg, WPARAM wParam,
+LRESULT CALLBACK page_focusmode_proc(HWND hDialog, UINT uMsg, WPARAM wParam,
                                 LPARAM lParam);
-LRESULT CALLBACK page_apptimer(HWND hDialog, UINT uMsg, WPARAM wParam,
+LRESULT CALLBACK page_apptimer_proc(HWND hDialog, UINT uMsg, WPARAM wParam,
                                LPARAM lParam);

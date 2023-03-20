@@ -2,13 +2,16 @@
 
 HINSTANCE hInstance_g;
 HWND hWindow_g;
+HWND hPage_top_g;
+HWND hPage_focusmode_g;
+HWND hPage_apptimer_g;
 FILE *logFile_g;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     PWSTR lpCmdLine, int nCmdShow) {
    winAPI_highDPI();
    hInstance_g = hInstance;
-   const wchar_t appName[] = L"mytest";
+   const wchar_t appName[] = L"YYScreenTime_win";
    WNDCLASS wndClass;
    HWND hWindow;
    MSG message;
@@ -36,7 +39,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    } else {
       fputws(L"Start log...\n", logFile);
       fflush(logFile);
-      logFile_g=logFile;
+      logFile_g = logFile;
    }
 
    DWORD *all_processes;
@@ -96,30 +99,34 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    // errno_t GetClassName_error = GetClassNameW(hWindow, windowClassName,
    // MAX_WINDOW_CLASS_NAME_LENGTH);
 
-   wndClass.style = CS_HREDRAW | CS_VREDRAW;
+   wndClass.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
    wndClass.lpfnWndProc = WndProc;
    wndClass.cbClsExtra = 0;
    wndClass.cbWndExtra = 0;
    wndClass.hInstance = hInstance;
-   wndClass.hIcon = LoadIcon(NULL, APPICON);
+   wndClass.hIcon = LoadIconW(hInstance, MAKEINTRESOURCEW(APPICON));
    wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
    wndClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
    wndClass.lpszMenuName = MAKEINTRESOURCEW(ID_MENU);
    wndClass.lpszClassName = appName;
 
-   if (!RegisterClass(&wndClass)) {
-      return 0;
+   if (RegisterClassW(&wndClass)==0) {
+      errno_t error=GetLastError();
+      fwprintf_s(logFile, L"error:%d @RegisterClassW", error);
+      return error;
    }
 
-   hWindow = CreateWindowW(appName, L"yyhome-tromb test", WS_OVERLAPPEDWINDOW,
-                           CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                           CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+   hWindow =
+       CreateWindowW(appName, L"YYScreenTime_win", WS_OVERLAPPEDWINDOW,
+                       CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+                       CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
 
-   if (hWindow == 0) {
-      fwprintf_s(logFile,L"error");
-      return 0;
+   if (hWindow == NULL) {
+      errno_t error=GetLastError();
+      fwprintf_s(logFile, L"error:%d @CreateWindowExW", error);
+      return error;
    }
-   hWindow_g=hWindow;
+   hWindow_g = hWindow;
 
    ShowWindow(hWindow, nCmdShow);
    UpdateWindow(hWindow);
@@ -147,13 +154,14 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
    static int selectedTab;
    static RECT clientRect;
    static HWND hTab;
-   static POINT window_point,tab_point,page_top_point,page_focus_point,page_timer_point;
+   static POINT window_point, tab_point, page_top_point, page_focus_point,
+       page_timer_point;
 
    HDC hDC;
    static PAINTSTRUCT paintStruct;
    static HPEN hPen, hPen_prev;
    static HBRUSH hBrush, hBrush_prev;
-   static HFONT hFont,hFont_prev;
+   static HFONT hFont, hFont_prev;
 
    hMenu = GetMenu(hWindow);
 
@@ -162,9 +170,12 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
          LPCREATESTRUCT lpcs;
          wchar_t message_CREATE[512];
          lpcs = (LPCREATESTRUCT)lParam;
-         errno_t settingTabControl_error =
-             settingTabControl(&hWindow, &clientRect, &hTab, &hInstance_g);
-         if (settingTabControl_error != 0) {
+         errno_t setting_tabControl_error =
+             setting_tabControl(&hWindow, &clientRect, &hTab, &hInstance_g);
+         errno_t setting_pages_error =
+             setting_pages(&hWindow, &clientRect, &hTab, &hInstance_g,
+                           &hPage_top_g, &hPage_focusmode_g, &hPage_apptimer_g,page_top_proc,page_focusmode_proc,page_apptimer_proc);
+         if (setting_tabControl_error != 0 || setting_pages_error != 0) {
             if (MessageBoxW(hWindow, L"エラーが発生しました。終了しますか？",
                             L"警告", MB_YESNO | MB_ICONWARNING) == IDYES &&
                 MessageBoxW(hWindow, L"本当に終了しますか？", L"終了の確認",
@@ -199,7 +210,7 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
 
             case IDM_ABOUT:
                DialogBoxW(hInstance_g, MAKEINTRESOURCEW(IDD_ABOUT), hWindow,
-                          dialog_about);
+                          dialog_about_proc);
                break;
 
             case IDM_EXIT:
@@ -248,25 +259,25 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
                             MB_YESNO | MB_ICONWARNING) == IDYES) {
                DestroyWindow(hWindow);
             } else {
-               return 0; //continue;
+               return 0;  // continue;
             }
          }
          TabCtrl_AdjustRect(hTab, FALSE, &clientRect);
          MoveWindow(hTab, 0, 0, LOWORD(lParam), HIWORD(lParam), TRUE);
 
-        window_point.x = window_point.y = 0;
-        ClientToScreen(hWindow, &window_point);
-        tab_point.x = tab_point.y = 0;
-        ClientToScreen(hTab, &tab_point);
+         window_point.x = window_point.y = 0;
+         ClientToScreen(hWindow, &window_point);
+         tab_point.x = tab_point.y = 0;
+         ClientToScreen(hTab, &tab_point);
 
-                                                                                                                                                         GetClientRect(hTab, &rc);
-                                                                                                                                                                                 TabCtrl_AdjustRect(hTab, FALSE, &rc);
-
-                                                                                                                                                                                                         int dx = tab_pt.x - dlg_pt.x;
-                                                                                                                                                                                                                                 int dy = tab_pt.y - dlg_pt.y;
-                                                                                                                                                                                                                                                         MoveWindow(hPage0, rc.left+dx, rc.top+dy, rc.right - rc.left, rc.bottom - rc.top , TRUE);
-                                                                                                                                                                                                                                                                                 MoveWindow(hPage1, rc.left+dx, rc.top+dy, rc.right - rc.left, rc.bottom - rc.top, TRUE);
-                                                                                                                                                                                                                                                                                                         break;
+         int dx = tab_point.x - window_point.x;
+         int dy = tab_point.y - window_point.y;
+         // MoveWindow(hPage0, clientRect.left + dx, clientRect.top + dy,
+         //            clientRect.right - clientRect.left,
+         //            clientRect.bottom - clientRect.top, TRUE);
+         // MoveWindow(hPage1, clientRect.left + dx, clientRect.top + dy,
+         // clientRect.right - clientRect.left,
+         //            clientRect.bottom - clientRect.top, TRUE);
          swprintf_s(message_SIZE, sizeof(message_SIZE) / 2, L"WM_SIZE (%d, %d)",
                     SIZE_x, SIZE_y);
          SetWindowText(hWindow, message_SIZE);
@@ -306,7 +317,7 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
    return DefWindowProc(hWindow, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK dialog_about(HWND hDialog, UINT uMsg, WPARAM wParam,
+LRESULT CALLBACK dialog_about_proc(HWND hDialog, UINT uMsg, WPARAM wParam,
                               LPARAM lParam) {
    UNREFERENCED_PARAMETER(lParam);
    switch (uMsg) {
@@ -320,4 +331,19 @@ LRESULT CALLBACK dialog_about(HWND hDialog, UINT uMsg, WPARAM wParam,
          }
    }
    return (INT_PTR)FALSE;
+}
+
+LRESULT CALLBACK page_top_proc(HWND hDialog, UINT uMsg, WPARAM wParam,
+                          LPARAM lParam) {
+   //
+}
+
+LRESULT CALLBACK page_focusmode_proc(HWND hDialog, UINT uMsg, WPARAM wParam,
+                                LPARAM lParam) {
+   //
+}
+
+LRESULT CALLBACK page_apptimer_proc(HWND hDialog, UINT uMsg, WPARAM wParam,
+                               LPARAM lParam) {
+   //
 }
