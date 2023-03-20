@@ -147,6 +147,7 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
    static int selectedTab;
    static RECT clientRect;
    static HWND hTab;
+   static POINT window_point,tab_point,page_top_point,page_focus_point,page_timer_point;
 
    HDC hDC;
    static PAINTSTRUCT paintStruct;
@@ -247,12 +248,25 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
                             MB_YESNO | MB_ICONWARNING) == IDYES) {
                DestroyWindow(hWindow);
             } else {
-               return 0;
+               return 0; //continue;
             }
-         } else {
-            TabCtrl_AdjustRect(hTab, FALSE, &clientRect);
-            MoveWindow(hTab, 0, 0, LOWORD(lParam), HIWORD(lParam), TRUE);
          }
+         TabCtrl_AdjustRect(hTab, FALSE, &clientRect);
+         MoveWindow(hTab, 0, 0, LOWORD(lParam), HIWORD(lParam), TRUE);
+
+        window_point.x = window_point.y = 0;
+        ClientToScreen(hWindow, &window_point);
+        tab_point.x = tab_point.y = 0;
+        ClientToScreen(hTab, &tab_point);
+
+                                                                                                                                                         GetClientRect(hTab, &rc);
+                                                                                                                                                                                 TabCtrl_AdjustRect(hTab, FALSE, &rc);
+
+                                                                                                                                                                                                         int dx = tab_pt.x - dlg_pt.x;
+                                                                                                                                                                                                                                 int dy = tab_pt.y - dlg_pt.y;
+                                                                                                                                                                                                                                                         MoveWindow(hPage0, rc.left+dx, rc.top+dy, rc.right - rc.left, rc.bottom - rc.top , TRUE);
+                                                                                                                                                                                                                                                                                 MoveWindow(hPage1, rc.left+dx, rc.top+dy, rc.right - rc.left, rc.bottom - rc.top, TRUE);
+                                                                                                                                                                                                                                                                                                         break;
          swprintf_s(message_SIZE, sizeof(message_SIZE) / 2, L"WM_SIZE (%d, %d)",
                     SIZE_x, SIZE_y);
          SetWindowText(hWindow, message_SIZE);
