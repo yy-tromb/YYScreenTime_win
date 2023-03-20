@@ -1,7 +1,8 @@
+RM = del
+
 CC = gcc
 CFLAGS = -mwindows -municode -Wl,-subsystem,windows -static -static-libgcc -static-libstdc++ -Wall -fexec-charset=CP932
 RESCC = windres
-RM = del
 RESCFLAGS = -O coff
 
 INC = -I .\include
