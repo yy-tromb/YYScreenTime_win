@@ -1,6 +1,7 @@
 #include "./include/main.h"
 
 HINSTANCE hInstance_g;
+HWND hWindow_g;
 FILE *logFile_g;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -118,6 +119,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       fwprintf_s(logFile,L"error");
       return 0;
    }
+   hWindow_g=hWindow;
 
    ShowWindow(hWindow, nCmdShow);
    UpdateWindow(hWindow);
