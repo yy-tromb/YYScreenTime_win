@@ -152,7 +152,7 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
    static HMENU hMenu;
    static unsigned int resident_flag, startup_flag;
    static int selectedTab;
-   static RECT clientRect;
+   static RECT clientRect,tabRect;
    static HWND hTab;
    static POINT window_point, tab_point, page_top_point, page_focus_point,
        page_timer_point;
@@ -263,7 +263,7 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
             }
          }
          TabCtrl_AdjustRect(hTab, FALSE, &clientRect);
-         MoveWindow(hTab, 0, 0, LOWORD(lParam), HIWORD(lParam), TRUE);
+         MoveWindow(hTab, 0, 0, SIZE_x, SIZE_y, TRUE);
 
          window_point.x = window_point.y = 0;
          ClientToScreen(hWindow, &window_point);
