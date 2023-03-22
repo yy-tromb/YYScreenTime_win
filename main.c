@@ -153,6 +153,7 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
    static unsigned int resident_flag, startup_flag;
    static int selectedTab;
    static RECT clientRect,tabRect;
+   static dx,dy;
    static HWND hTab;
    static POINT window_point, tab_point, page_top_point, page_focus_point,
        page_timer_point;
@@ -262,19 +263,19 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
                return 0;  // continue;
             }
          }
-         TabCtrl_AdjustRect(hTab, FALSE, &clientRect);
          MoveWindow(hTab, 0, 0, SIZE_x, SIZE_y, TRUE);
+         TabCtrl_AdjustRect(hTab, FALSE, &tabRect);
 
          window_point.x = window_point.y = 0;
          ClientToScreen(hWindow, &window_point);
          tab_point.x = tab_point.y = 0;
          ClientToScreen(hTab, &tab_point);
 
-         int dx = tab_point.x - window_point.x;
-         int dy = tab_point.y - window_point.y;
-         // MoveWindow(hPage0, clientRect.left + dx, clientRect.top + dy,
-         //            clientRect.right - clientRect.left,
-         //            clientRect.bottom - clientRect.top, TRUE);
+         dx = tab_point.x - window_point.x;
+         dy = tab_point.y - window_point.y;
+         MoveWindow(hPage_top_g, tabRect.left + dx, tabRect.top + dy,
+                     tabRect.right - tabRect.left,
+                     tabRect.bottom - tabRect.top, TRUE);
          // MoveWindow(hPage1, clientRect.left + dx, clientRect.top + dy,
          // clientRect.right - clientRect.left,
          //            clientRect.bottom - clientRect.top, TRUE);
