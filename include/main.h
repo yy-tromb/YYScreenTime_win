@@ -26,7 +26,7 @@
 #include "./winutils.h"
 #include "./strutil.h"
 #include "./guiutils.h"
-#include "./include/procs.h"
+#include "./procs.h"
 #include "./resource.h"
 
 #define perY(percent) ((int)SIZE_y * (percent / 100))

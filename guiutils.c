@@ -73,7 +73,7 @@ errno_t setting_pages(HWND *hWindowP, RECT *clientRectP, HWND *hTabP,
       return (errno_t)GetLastError();
    }
 
-   //page:focusmode
+   // page:focusmode
    childWindowClass.lpszClassName = L"YYScreenTime_win_page_focusmode";
    childWindowClass.lpfnWndProc = *page_focusmode_procP;
    if (RegisterClassExW(&childWindowClass) == 0) {
@@ -87,9 +87,9 @@ errno_t setting_pages(HWND *hWindowP, RECT *clientRectP, HWND *hTabP,
       return (errno_t)GetLastError();
    }
 
-   //page:apptimer
+   // page:apptimer
    childWindowClass.lpszClassName = L"YYScreenTime_win_page_apptimer";
-   childWindowClass.lpfnWndProc = *page_focusmode_procP;
+   childWindowClass.lpfnWndProc = *page_apptimer_procP;
    if (RegisterClassExW(&childWindowClass) == 0) {
       return (errno_t)GetLastError();
    }
@@ -100,17 +100,45 @@ errno_t setting_pages(HWND *hWindowP, RECT *clientRectP, HWND *hTabP,
    if (*hPage_apptimerP == NULL) {
       return (errno_t)GetLastError();
    }
+   errno_t setting_page_error = setting_page_top(*hPage_topP);
+   if (setting_page_error != 0) {
+      return setting_page_error;
+   }
+   setting_page_error = setting_page_focusmode(*hPage_focusmodeP);
+   if (setting_page_error != 0) {
+      return setting_page_error;
+   }
+   setting_page_error = setting_page_apptimer(*hPage_apptimerP);
+   if (setting_page_error != 0) {
+      return setting_page_error;
+   }
+
    return 0;
 }
 
-errno_t changePage(int targetPageIndex,HWND tabs[TAB_NUM]){
+errno_t changePage(int targetPageIndex, HWND tabs[]) {
    int i;
-   for(i=0;i<TAB_NUM;i++){
-      if(i==targetPageIndex){
-         ShowWindow(tabs[i],SW_SHOW);
-      }else{
-         ShowWindow(tabs[i],SW_HIDE);
+   char hoge[2] = {targetPageIndex + 48, '\0'};
+   MessageBoxA(NULL, hoge,"",MB_OK);
+   for (i = 0; i < TAB_NUM; i++) {
+      if (i == targetPageIndex) {
+         ShowWindow(tabs[i], SW_SHOW);
+      } else {
+         ShowWindow(tabs[i], SW_HIDE);
       }
    }
+   return 0;
+}
+
+errno_t setting_page_top(HWND hPage_top, ...) {
+   //
+   return 0;
+}
+errno_t setting_page_focusmode(HWND hPage_focusmode, ...) {
+   //
+   return 0;
+}
+errno_t setting_page_apptimer(HWND hPage_apptimer, ...) {
+   //
    return 0;
 }

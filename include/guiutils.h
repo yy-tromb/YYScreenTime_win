@@ -29,4 +29,7 @@ errno_t setting_pages(HWND *hWindow, RECT *clientRect, HWND *hTab,
                       HINSTANCE *hInstance, HWND *hPage_top, HWND *hPage_focusmode,
                       HWND *hPage_apptimer, WNDPROC page_top_proc,
                       WNDPROC page_focusmode_proc, WNDPROC page_apptimer_proc);
+errno_t setting_page_top(HWND hPage_top,...);
+errno_t setting_page_focusmode(HWND hPage_focusmode,...);
+errno_t setting_page_apptimer(HWND hPage_apptimer,...);
 errno_t changePage(int targetPageIndex,HWND tabs[]);

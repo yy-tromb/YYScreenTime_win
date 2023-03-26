@@ -151,7 +151,7 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
    static HMENU hMenu;
    static unsigned int resident_flag, startup_flag;
    static HWND tabs[TAB_NUM];
-   static int selectedTab=0,previousTab=0;
+   static int selectedTab = 0, previousTab = 0;
    static RECT clientRect, tabRect;
    static dx, dy;
    static HWND hTab;
@@ -181,9 +181,11 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
             checkErrorExit(&hWindow);
             return 0;
          }
-         tabs[TAB_TOP]=hPage_top_g;
-         tabs[TAB_FOCUSMODE]=hPage_focusmode_g;
-         tabs[TAB_APPTIMER]=hPage_apptimer_g;
+         tabs[TAB_TOP] = hPage_top_g;
+         tabs[TAB_FOCUSMODE] = hPage_focusmode_g;
+         tabs[TAB_APPTIMER] = hPage_apptimer_g;
+         selectedTab = 0;
+         changePage(selectedTab, tabs);
          SendMessageW(hWindow, WM_SIZE, 0,
                       MAKELPARAM(clientRect.right, clientRect.bottom));
          /*swprintf_s(message_CREATE, sizeof(message_CREATE) / 2,
@@ -199,16 +201,16 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
          wm_event = HIWORD(wParam);
          switch (wm_id) {
             case IDM_FOCUSMODE:
-               previousTab=selectedTab;
-               selectedTab=TAB_FOCUSMODE;
-               TabCtrl_SetCurSel(hTab,TAB_FOCUSMODE);
-               changePage(selectedTab,tabs);
+               previousTab = selectedTab;
+               selectedTab = TAB_FOCUSMODE;
+               TabCtrl_SetCurSel(hTab, TAB_FOCUSMODE);
+               changePage(selectedTab, tabs);
                break;
 
             case IDM_APPTIMER:
                previousTab = selectedTab;
-               selectedTab = TAB_FOCUSMODE;
-               TabCtrl_SetCurSel(hTab, TAB_FOCUSMODE);
+               selectedTab = TAB_APPTIMER;
+               TabCtrl_SetCurSel(hTab, TAB_APPTIMER);
                changePage(selectedTab, tabs);
                break;
 
@@ -228,6 +230,11 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
                           dialog_about_proc);
                break;
 
+            case IDM_SETTING:
+               //
+               MessageBoxW(hWindow,L"作成中",L"",MB_OK);
+               break;
+
             case IDM_EXIT:
                if (MessageBoxW(hWindow, L"本当に終了しますか？", L"終了の確認",
                                MB_YESNO | MB_ICONWARNING) == IDYES) {
@@ -240,6 +247,7 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
             default:
                return DefWindowProcW(hWindow, uMsg, wParam, lParam);
          }
+         return 0;
          break;
 
       case WM_GETMINMAXINFO:
@@ -266,14 +274,14 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
          SIZE_x = LOWORD(lParam);  // x 座標を取り出す
          WINBOOL GetClientRect_error = GetClientRect(hWindow, &clientRect);
          if (GetClientRect_error == 0) {
-            logError(__LINE__,GetLastError());
+            logError(__LINE__, GetLastError());
             checkErrorExit(&hWindow);
             return 0;
          }
          MoveWindow(hTab, 0, 0, SIZE_x, SIZE_y, TRUE);
          GetClientRect_error = GetClientRect(hTab, &tabRect);
          if (GetClientRect_error == 0) {
-            logError(__LINE__,GetLastError());
+            logError(__LINE__, GetLastError());
             checkErrorExit(&hWindow);
             return 0;
          }
@@ -283,41 +291,41 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
          window_point.x = window_point.y = 0;
          WINBOOL ClientToScreen_error = ClientToScreen(hWindow, &window_point);
          if (ClientToScreen_error == 0) {
-            logError(__LINE__,GetLastError());
+            logError(__LINE__, GetLastError());
             checkErrorExit(&hWindow);
             return 0;
          }
          tab_point.x = tab_point.y = 0;
-         ClientToScreen_error= ClientToScreen(hTab, &tab_point);
+         ClientToScreen_error = ClientToScreen(hTab, &tab_point);
          if (ClientToScreen_error == 0) {
-            logError(__LINE__,GetLastError());
+            logError(__LINE__, GetLastError());
             checkErrorExit(&hWindow);
             return 0;
          }
 
          dx = tab_point.x - window_point.x;
          dy = tab_point.y - window_point.y;
-         WINBOOL MoveWindow_error = MoveWindow(hPage_top_g, tabRect.left + dx, tabRect.top + dy,
-                    tabRect.right - tabRect.left, tabRect.bottom - tabRect.top,
-                    TRUE);
+         WINBOOL MoveWindow_error = MoveWindow(
+             hPage_top_g, tabRect.left + dx, tabRect.top + dy,
+             tabRect.right - tabRect.left, tabRect.bottom - tabRect.top, TRUE);
          if (MoveWindow_error == 0) {
-            logError(__LINE__,GetLastError());
+            logError(__LINE__, GetLastError());
             checkErrorExit(&hWindow);
             return 0;
          }
-         MoveWindow_error = MoveWindow(hPage_focusmode_g, tabRect.left + dx, tabRect.top + dy,
-                    tabRect.right - tabRect.left, tabRect.bottom - tabRect.top,
-                    TRUE);
+         MoveWindow_error = MoveWindow(
+             hPage_focusmode_g, tabRect.left + dx, tabRect.top + dy,
+             tabRect.right - tabRect.left, tabRect.bottom - tabRect.top, TRUE);
          if (MoveWindow_error == 0) {
-            logError(__LINE__,GetLastError());
+            logError(__LINE__, GetLastError());
             checkErrorExit(&hWindow);
             return 0;
          }
-         MoveWindow_error = MoveWindow(hPage_apptimer_g, tabRect.left + dx, tabRect.top + dy,
-                    tabRect.right - tabRect.left, tabRect.bottom - tabRect.top,
-                    TRUE);
+         MoveWindow_error = MoveWindow(
+             hPage_apptimer_g, tabRect.left + dx, tabRect.top + dy,
+             tabRect.right - tabRect.left, tabRect.bottom - tabRect.top, TRUE);
          if (MoveWindow_error == 0) {
-            logError(__LINE__,GetLastError());
+            logError(__LINE__, GetLastError());
             checkErrorExit(&hWindow);
             return 0;
          }
@@ -332,7 +340,7 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
             case TCN_SELCHANGE:
                InvalidateRect(hTab, NULL, TRUE);
                selectedTab = TabCtrl_GetCurSel(hTab);
-               changePage(selectedTab,tabs);
+               changePage(selectedTab, tabs);
                return 0;
                break;
 
@@ -360,4 +368,3 @@ LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam,
 
    return DefWindowProcW(hWindow, uMsg, wParam, lParam);
 }
-

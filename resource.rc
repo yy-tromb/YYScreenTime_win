@@ -101,7 +101,7 @@ CAPTION "このアプリについて"
 FONT 18, "ＭＳ Ｐゴシック"
 BEGIN
     ICON            APPICON,IDC_STATIC,20,20,20,20
-    LTEXT           "YYScreenTime_win ver.α0.2",IDC_STATIC,50,14,114,8,SS_NOPREFIX
+    LTEXT           "YYScreenTime_win ver.α0.3",IDC_STATIC,50,14,114,8,SS_NOPREFIX
     LTEXT           "Copyright (C) yy-tromb 2023",IDC_STATIC,50,26,114,8
     DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
 END

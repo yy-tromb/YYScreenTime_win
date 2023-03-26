@@ -18,15 +18,33 @@ LRESULT CALLBACK dialog_about_proc(HWND hDialog, UINT uMsg, WPARAM wParam,
 
 LRESULT CALLBACK page_top_proc(HWND hPage_top, UINT uMsg, WPARAM wParam,
                                LPARAM lParam) {
+   switch (uMsg) {
+      case WM_SHOWWINDOW:
+         MessageBoxA(NULL, "top", "", MB_OK);  // debug
+         return 0;
+         break;
+   }
    return DefWindowProcW(hPage_top, uMsg, wParam, lParam);
 }
 
 LRESULT CALLBACK page_focusmode_proc(HWND hPage_focusmode, UINT uMsg,
                                      WPARAM wParam, LPARAM lParam) {
+   switch (uMsg) {
+      case WM_SHOWWINDOW:
+         MessageBoxA(NULL, "focusmode", "", MB_OK);  // debug
+         return 0;
+         break;
+   }
    return DefWindowProcW(hPage_focusmode, uMsg, wParam, lParam);
 }
 
 LRESULT CALLBACK page_apptimer_proc(HWND hPage_apptimer, UINT uMsg,
                                     WPARAM wParam, LPARAM lParam) {
+   switch (uMsg) {
+      case WM_SHOWWINDOW:
+         MessageBoxA(NULL, "apptimer", "", MB_OK);  // debug
+         return 0;
+         break;
+   }
    return DefWindowProcW(hPage_apptimer, uMsg, wParam, lParam);
 }
