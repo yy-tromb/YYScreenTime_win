@@ -26,18 +26,13 @@
 #include "./winutils.h"
 #include "./strutil.h"
 #include "./guiutils.h"
+#include "./include/procs.h"
 #include "./resource.h"
 
 #define perY(percent) ((int)SIZE_y * (percent / 100))
 #define perX(percent) ((int)SIZE_x * (percent / 100))
 
+#define ShowDebugInfo(line) ({char hoge[64];sprintf_s(hoge,64,"%d",line);MessageBoxA(NULL,hoge,"",MB_OK);})
+#define logError(line,error) ({fwprintf_s(logFile_g,L"error:%d line:%d\n",error,line);fflush(logFile_g);})
 
 LRESULT CALLBACK WndProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK dialog_about_proc(HWND hDialog, UINT uMsg, WPARAM wParam,
-                              LPARAM lParam);
-LRESULT CALLBACK page_top_proc(HWND hDialog, UINT uMsg, WPARAM wParam,
-                          LPARAM lParam);
-LRESULT CALLBACK page_focusmode_proc(HWND hDialog, UINT uMsg, WPARAM wParam,
-                                LPARAM lParam);
-LRESULT CALLBACK page_apptimer_proc(HWND hDialog, UINT uMsg, WPARAM wParam,
-                               LPARAM lParam);

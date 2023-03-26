@@ -9,7 +9,7 @@ errno_t setting_tabControl(HWND *hWindowP, RECT *clientRectP, HWND *hTabP,
    if (InitCommonControlsEx(&initCommonControlsExData) == FALSE) {
       return (errno_t)1;
    }
-   errno_t GetClientRect_error = GetClientRect(*hWindowP, clientRectP);
+   WINBOOL GetClientRect_error = GetClientRect(*hWindowP, clientRectP);
    if (GetClientRect_error == 0) {
       return (errno_t)GetLastError();
    }
@@ -34,14 +34,12 @@ errno_t setting_tabControl(HWND *hWindowP, RECT *clientRectP, HWND *hTabP,
    SendMessageW(*hTabP, WM_SETFONT, (WPARAM)hFont_prev, 0);
    tabItem.mask = TCIF_TEXT;
    tabItem.pszText = L"ホーム";
-   TabCtrl_InsertItem(*hTabP, 0, &tabItem);
+   TabCtrl_InsertItem(*hTabP, TAB_TOP, &tabItem);
    tabItem.pszText = L"フォーカスモード";
-   TabCtrl_InsertItem(*hTabP, 1, &tabItem);
+   TabCtrl_InsertItem(*hTabP, TAB_FOCUSMODE, &tabItem);
    tabItem.pszText = L"アプリタイマー";
-   TabCtrl_InsertItem(*hTabP, 2, &tabItem);
+   TabCtrl_InsertItem(*hTabP, TAB_APPTIMER, &tabItem);
    SelectObject(hDC, hFont);
-   SendMessageW(*hWindowP, WM_SIZE, 0,
-                MAKELPARAM(clientRectP->right, clientRectP->bottom));
    return (errno_t)0;
 }
 
@@ -65,42 +63,54 @@ errno_t setting_pages(HWND *hWindowP, RECT *clientRectP, HWND *hTabP,
    childWindowClass.lpszClassName = L"YYScreenTime_win_page_top";
    childWindowClass.lpfnWndProc = *page_top_procP;
    if (RegisterClassExW(&childWindowClass) == 0) {
-      return GetLastError();
+      return (errno_t)GetLastError();
    }
    *hPage_topP = CreateWindowExW(
        0, L"YYScreenTime_win_page_top", L"", WS_CHILD | WS_VISIBLE,
        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, *hWindowP,
        (HMENU)ID_PAGE_TOP, *hInstanceP, NULL);
    if (*hPage_topP == NULL) {
-      return GetLastError();
+      return (errno_t)GetLastError();
    }
 
    //page:focusmode
    childWindowClass.lpszClassName = L"YYScreenTime_win_page_focusmode";
    childWindowClass.lpfnWndProc = *page_focusmode_procP;
    if (RegisterClassExW(&childWindowClass) == 0) {
-      return GetLastError();
+      return (errno_t)GetLastError();
    }
    *hPage_focusmodeP = CreateWindowExW(
        0, L"YYScreenTime_win_page_focusmode", L"", WS_CHILD | WS_VISIBLE,
        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, *hWindowP,
        (HMENU)ID_PAGE_TOP, *hInstanceP, NULL);
    if (*hPage_focusmodeP == NULL) {
-      return GetLastError();
+      return (errno_t)GetLastError();
    }
 
    //page:apptimer
    childWindowClass.lpszClassName = L"YYScreenTime_win_page_apptimer";
    childWindowClass.lpfnWndProc = *page_focusmode_procP;
    if (RegisterClassExW(&childWindowClass) == 0) {
-      return GetLastError();
+      return (errno_t)GetLastError();
    }
    *hPage_apptimerP = CreateWindowExW(
        0, L"YYScreenTime_win_page_apptimer", L"", WS_CHILD | WS_VISIBLE,
        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, *hWindowP,
        (HMENU)ID_PAGE_TOP, *hInstanceP, NULL);
    if (*hPage_apptimerP == NULL) {
-      return GetLastError();
+      return (errno_t)GetLastError();
+   }
+   return 0;
+}
+
+errno_t changePage(int targetPageIndex,HWND tabs[TAB_NUM]){
+   int i;
+   for(i=0;i<TAB_NUM;i++){
+      if(i==targetPageIndex){
+         ShowWindow(tabs[i],SW_SHOW);
+      }else{
+         ShowWindow(tabs[i],SW_HIDE);
+      }
    }
    return 0;
 }

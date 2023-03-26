@@ -20,6 +20,7 @@
 #include <windows.h>
 #include <Psapi.h>
 
+errno_t checkErrorExit(HWND *hWindow);
 
 errno_t getProcesses(DWORD **all_processes, unsigned int *process_count);
 errno_t getProcessName(DWORD processID, wchar_t **exeName);

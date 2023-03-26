@@ -8,7 +8,7 @@ RESCFLAGS = -O coff
 INC = -I .\include
 LIB = -L .\lib
 
-SRCS = main.c winutils.c strutil.c guiutils.c
+SRCS = main.c winutils.c strutil.c guiutils.c procs.c
 RESRCS = resource.rc
 OBJS = $(SRCS:%.c=%.o)
 RESOBJS = $(RESRCS:%.rc=%.res)

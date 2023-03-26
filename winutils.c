@@ -2,6 +2,22 @@
 
 #define GET_WINDOWS_HEAP_COUNT 1024
 
+errno_t checkErrorExit(HWND *hWindow){
+   if (MessageBoxW(*hWindow,
+                   L"エラーが発生しました。続行した場合の動作は保証しません。終了しますか？",
+                   L"警告", MB_YESNO | MB_ICONWARNING) == IDYES &&
+       MessageBoxW(*hWindow, L"本当に終了しますか？", L"終了の確認",
+                   MB_YESNO | MB_ICONWARNING) == IDYES) {
+      if(DestroyWindow(*hWindow)==0){
+         return (errno_t)GetLastError();
+      }else{
+         return 0;
+      }
+   } else {
+      return 0;  // continue;
+   }
+}
+
 errno_t getProcesses(DWORD **all_processes, unsigned int *all_processes_count) {
    DWORD allProcesses_size;
    DWORD neededSize;
