@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="29976CBD-EF55-4647-953E-B47ABE34DF84" Name="YYScreenTime_win" Language="1041" Version="0.3" Manufacturer="yy-tromb" UpgradeCode="7360EBE8-1650-42AB-A70F-707EDEBD885F" Codepage="932">
+        <Package Description="App like ScreenTime in iOS" Comments="YYScreenTime_win α0.3. This is not complete version." InstallerVersion="200" Compressed="yes" SummaryCodepage="932" Platform="x64" />
+        <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFiles64Folder" Name="PFiles">
+                <Directory Id="yy_tromb" Name="yy-tromb">
+                    <Directory Id="YYScreenTime_win" Name="YYScreenTime_win">
+                        <Component Id="YYScreenTime_win.exe" Guid="0B0809B5-934F-43F5-8CAE-8D7F9B398450">
+                            <File Id="YYSCREENTIME_WIN.EXE" Name="YYScreenTime_win.exe" Source="YYScreenTime_win.exe" />
+                        </Component>
+                    </Directory>
+                </Directory>
+            </Directory>
+        </Directory>
+        <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
+            <ComponentRef Id="YYScreenTime_win.exe" />
+        </Feature>
+        <UI />
+        <UIRef Id="WixUI_InstallDir" />
+        <Property Id="WIXUI_INSTALLDIR" Value="YYScreenTime_win" />
+        <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
+    </Product>
+</Wix>

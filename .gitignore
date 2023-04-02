@@ -65,3 +65,7 @@ foo*.*
 /*.txt
 /image.png
 /ref/
+
+*.wixobj
+*.wixpdb
+*.msi

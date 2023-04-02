@@ -1,7 +1,7 @@
 RM = del
 
 CC = gcc
-CFLAGS = -mwindows -municode -Wl,-subsystem,windows -static -static-libgcc -static-libstdc++ -Wall -fexec-charset=CP932
+CFLAGS = -mwindows -municode -Wl,-subsystem,windows -static -static-libgcc -static-libstdc++ -Wall -fexec-charset=CP932 -m64
 RESCC = windres
 RESCFLAGS = -O coff
 
@@ -21,7 +21,7 @@ EXT ?= exe
 ifeq ($(findstring -g,$(EXFLAGS)),-g)
 	BUILD = $(NAME)_debug.$(EXT)
 else
-	BUILD =$(NAME).$(EXT)
+	BUILD = $(NAME).$(EXT)
 endif
 
 build: $(BUILD)
@@ -37,13 +37,23 @@ $(BUILD): $(OBJS) $(RESOBJS)
 .c.o:
 	$(CC) $(CFLAGS) $(EXFLAGS) $(INC) -c $< -o $@
 
+msi: $(BUILD)
+	candle -arch x64 YYScreenTime_win.wxs
+	light -cultures:ja-jp -ext WixUIExtension YYScreenTime_win.wixobj
+
+msiclean:
+	$(RM) YYScreenTime_win.wixobj
+	$(RM) YYScreenTime_win.wixpdb
+
 clean:
 	$(RM) $(OBJS)
 	$(RM) $(RESOBJS)
 
 fullclean:
 	make clean
+	make msiclean
 	$(RM) $(BUILD)
+	$(RM) YYScreenTime_win.msi
 
 re:
 	make clean
