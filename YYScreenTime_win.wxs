@@ -10,12 +10,20 @@
                         <Component Id="YYScreenTime_win.exe" Guid="0B0809B5-934F-43F5-8CAE-8D7F9B398450">
                             <File Id="YYSCREENTIME_WIN.EXE" Name="YYScreenTime_win.exe" Source="YYScreenTime_win.exe" />
                         </Component>
+                        <Component Id="LICENSE" DiskId="1" Guid="C77EB4CF-555E-4557-8DDD-130A5F35938F">
+                            <File Id="LICENSE" Name="LICENSE" Source="LICENSE" />
+                        </Component>
+                        <Component Id="README.MD" DiskId="1" Guid="E435F3F4-E712-4D9A-B523-72981D0DE126">
+                            <File Id="README.MD" Name="README.md" Source="README.md" />
+                        </Component>
                     </Directory>
                 </Directory>
             </Directory>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
             <ComponentRef Id="YYScreenTime_win.exe" />
+            <ComponentRef Id="LICENSE" />
+            <ComponentRef Id="README.MD" />
         </Feature>
         <UI />
         <UIRef Id="WixUI_InstallDir" />
