@@ -37,6 +37,10 @@ $(BUILD): $(OBJS) $(RESOBJS)
 .c.o:
 	$(CC) $(CFLAGS) $(EXFLAGS) $(INC) -c $< -o $@
 
+clean:
+	$(RM) $(OBJS)
+	$(RM) $(RESOBJS)
+
 msi: $(BUILD)
 	candle -arch x64 YYScreenTime_win.wxs
 	light -cultures:ja-jp -ext WixUIExtension YYScreenTime_win.wixobj
@@ -44,10 +48,6 @@ msi: $(BUILD)
 msiclean:
 	$(RM) YYScreenTime_win.wixobj
 	$(RM) YYScreenTime_win.wixpdb
-
-clean:
-	$(RM) $(OBJS)
-	$(RM) $(RESOBJS)
 
 fullclean:
 	make clean
