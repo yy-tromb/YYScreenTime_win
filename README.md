@@ -11,4 +11,12 @@ You have to install "make".
 If you are windows, you can install "make" with winget.  
 `$ winget install GnuWin32.Make`  
   
+### About Makefile
+- `$ make` or `$ make build` : build  
+- `$ make clean` : remove *.o *.res
+- `$ make msi` : make Wix installer (MSI)  
+- `$ make msiclean` : remove *.wixobj *.wixpdb  
+- `$ make fullclean` : clean & msiclean  
+- `$ make re` : fullclean & msi  
+    
 I love VSCode,so I build this with MinGW.   
