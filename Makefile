@@ -56,5 +56,5 @@ fullclean:
 	$(RM) YYScreenTime_win.msi
 
 re:
-	make clean
 	make fullclean
+	make msi
