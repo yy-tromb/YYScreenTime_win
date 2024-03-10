@@ -1,6 +1,6 @@
 ## ※I'm Japanese, so my English skills are low .  
 ## Now,I have already stopped developping this application. So use this [YYScreenTime_win-rs](https://github.com/yy-tromb/YYScreenTime_win-rs)  
-[YYScreenTime_win-rs](https://github.com/yy-tromb/YYScreenTime_win-rs) is my app like this app that written in [Rust](https://github.com/rust-lang/rust).  
+[YYScreenTime_win-rs](https://github.com/yy-tromb/YYScreenTime_win-rs) is my app like this app, and it is written in [Rust](https://github.com/rust-lang/rust).  
   
 # YYScreenTime_win  
 Windows ScreenTime for me  
